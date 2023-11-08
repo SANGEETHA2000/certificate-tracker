@@ -27,7 +27,7 @@ mongoose.connect('mongodb+srv://sangeetha2000vd:San755t81@cluster0.8fjl8mr.mongo
 });
 
 // Schedule the checkDatabaseAndSendEmails function to run daily at midnight
-cron.schedule('0 0 * * *', domainService.checkDatabaseAndSendEmails());
+cron.schedule('0 0 * * *', domainService.checkDatabaseAndSendEmails);
 
 // Listen to the server
 const PORT = process.env.PORT || 3000;
