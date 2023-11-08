@@ -17,7 +17,7 @@ app.use(express.static('client'));
 app.use(domainRoutes);
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://sangeetha2000vd:San755t81@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
+mongoose.connect('mongodb+srv://<db-connection>@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
 .then(() => {
   console.log('Connected to MongoDB');
   // domainService.checkDatabaseAndSendEmails();
