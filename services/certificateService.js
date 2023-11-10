@@ -26,10 +26,8 @@ async function getCertificateDetails(req, res) {
 
     // Fetch the SSL certificate details
     const details = {
-      issuer: cert.issuer,
       valid_from: cert.valid_from,
       valid_until: cert.valid_to,
-      subject: cert.subject,
     };
 
     // Return the response

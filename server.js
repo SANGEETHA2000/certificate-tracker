@@ -10,17 +10,16 @@ const app = express();
 // Parses JSON payloads
 app.use(express.json());
 
-// Serve the static files from the client' directory
+// Serve the static files from the 'client' directory
 app.use(express.static('client'));
 
 // Use domainRoutes for API routes
 app.use(domainRoutes);
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://<db-connection>@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
+mongoose.connect('mongodb+srv://sangeetha2000vd:San755t81@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
 .then(() => {
   console.log('Connected to MongoDB');
-  // domainService.checkDatabaseAndSendEmails();
 })
 .catch(error => {
   console.error('Error connecting to MongoDB:', error);
