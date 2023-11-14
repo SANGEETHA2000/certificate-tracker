@@ -51,8 +51,7 @@ async function addDomain(req, res) {
       res.json(domain);
     })
     .catch(error => {
-      console.error('Error adding domain:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: error });
     });
 }
 

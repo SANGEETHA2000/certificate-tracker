@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 
 // Serve the static files from the 'client' directory
-app.use(express.static('client'));
+app.use(express.static('client_old'));
 
 // Use domainRoutes for API routes
 app.use(domainRoutes);

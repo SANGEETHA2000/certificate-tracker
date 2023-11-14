@@ -12,6 +12,10 @@
     outline: none;
 }
 
+.input-box:disabled {
+    opacity: 0.5;
+}
+
 .button {
     border: 1px solid rgb(225, 224, 224);
     border-radius: 9999px;
@@ -24,6 +28,11 @@
 .button:hover {
     background-color: #9736f2;
     outline: none;
+}
+
+.button:disabled {
+    background-color: #a955f766;
+    pointer-events: none;
 }
 
 table {
@@ -48,4 +57,8 @@ td::after {
 td:first-child {
     font-weight: bold;
     color: rgb(49, 49, 105);
+}
+
+p {
+    color: red;    
 }
