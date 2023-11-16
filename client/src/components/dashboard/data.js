@@ -7,7 +7,8 @@ function getData() {
         isNotified: true,
         daysBeforeNotified: 30,
         email: "sangeetha2000.vd@gmail.com",
-        inNotificationPeriod: false
+        inNotificationPeriod: false,
+        lastEmailSent: null
       },
       {
         domain: 'google.com',
@@ -16,7 +17,8 @@ function getData() {
         isNotified: true,
         daysBeforeNotified: 60,
         email: "sangeetha2000.vd@gmail.com",
-        inNotificationPeriod: true
+        inNotificationPeriod: true,
+        lastEmailSent: null
       },
       {
         domain: 'dummy.com',
@@ -25,7 +27,8 @@ function getData() {
         isNotified: false,
         daysBeforeNotified: null,
         email: "sangeetha2000.vd@gmail.com",
-        inNotificationPeriod: false
+        inNotificationPeriod: false,
+        lastEmailSent: null
       }
     ]
 

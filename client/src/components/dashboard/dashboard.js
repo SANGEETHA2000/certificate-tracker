@@ -2,6 +2,10 @@ import appLogo from '../../assets/logo.png';
 import TableViewComponent from './tableView/tableView';
 
 const DashboardComponent = () => {
+    // componentDidMount = () => {
+
+    // }
+
     return (
         <div className="flex flex-col w-full h-full">
             <div className="flex flex-row basis-1/12 bg-teal-600 justify-between px-4">
@@ -10,7 +14,7 @@ const DashboardComponent = () => {
                     <span className='text-2xl text-white font-semibold'>SSL Certificate Monitor</span>   
                 </div>
                 <div className='flex items-center'>
-                    <button className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'>SIGN OUT</button>
+                    <button className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'>LOG OUT</button>
                 </div>
             </div>
             <div className='flex basis-11/12 flex-row'>

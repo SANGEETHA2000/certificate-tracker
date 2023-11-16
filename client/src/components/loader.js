@@ -13,12 +13,12 @@ const LoaderComponent = () => {
                 }
                 return prevDots + '.';
             });
-        }, 700);
+        }, 400);
         return () => clearInterval(intervalId);
     }, []); // Empty dependency array to run the effect only once on mount
 
     return (
-        <div className="bg-white h-full w-full items-center justify-center flex flex-col">
+        <div className="bg-white h-full w-full items-center justify-center flex flex-col opacity-50">
             <div className="shadow-xl shadow-teal-100 h-16 w-16">
                 <img src={appLogo} alt="SSL Monitor Logo" />
             </div>

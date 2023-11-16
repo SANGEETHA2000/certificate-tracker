@@ -8,7 +8,7 @@ async function getCertificateDetails(req, res) {
 
   // Validate the domain parameter
   if (!domain) {
-    return res.status(400).json({ error: 'Missing domain parameter' });
+    return res.status(400).json({ error: 'Domain Name Missing!' });
   }
 
   // Set the options' values to connect with TLS
@@ -28,6 +28,7 @@ async function getCertificateDetails(req, res) {
     const details = {
       valid_from: cert.valid_from,
       valid_until: cert.valid_to,
+      issuer: cert.issuer.O
     };
 
     // Return the response
@@ -39,8 +40,21 @@ async function getCertificateDetails(req, res) {
 
   // Print error message if any error occurs with TLS connection
   secureSocket.on('error', (err) => {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: "Invalid Domain Name!" });
   });
+}
+
+async function getDomainList(req, res) {
+  const userEmail = req.query.userEmail;
+  if (!userEmail) {
+    return res.status(400).json({ error: 'Missing user email' });
+  }
+  try {
+    const result = await DomainDetail.find({ email: userEmail });
+    res.json(result);
+  } catch (error) {
+    res.status(500).send('Internal Server Error');
+  }
 }
 
 async function addDomain(req, res) {
@@ -59,7 +73,6 @@ async function checkDatabaseAndSendEmails() {
   try {
     // Get the current date
     const currentDate = new Date();
-    console.log(currentDate)
 
     // Get the date 30 days from now
     const endDate = new Date();
@@ -91,5 +104,6 @@ async function checkDatabaseAndSendEmails() {
 module.exports = {
   getCertificateDetails,
   addDomain,
-  checkDatabaseAndSendEmails
+  checkDatabaseAndSendEmails,
+  getDomainList
 };
