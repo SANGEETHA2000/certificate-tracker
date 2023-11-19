@@ -22,9 +22,12 @@ const Dashboard = () => {
         fetchData();
     }, []);
 
-    useEffect(() => {
-        setUserData
-    }, [userData]);
+    const handleNewRowData = (newRowData) => {
+        setUserData([
+            ...userData,
+            newRowData
+        ]);
+    }
 
     return (
         <div className="flex flex-col w-full h-full">
@@ -43,7 +46,7 @@ const Dashboard = () => {
                 </div>
                 <div className='flex basis-4/5 bg-teal-50 p-5'>
                     {!userDataError && (
-                        <TableViewComponent rowData={userData} />
+                        <TableViewComponent rowData={userData} handleNewRowData={handleNewRowData}/>
                     )}
                     {userDataError && (
                         <div className='flex flex-col items-center justify-center gap-6 pb-5 h-full w-full'>

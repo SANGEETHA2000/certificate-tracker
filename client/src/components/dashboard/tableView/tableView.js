@@ -8,8 +8,7 @@ import CheckCertificateDetailsDialogComponent from './checkCertificateDetails/ch
 import AddDomainDialogComponent from './addDomain/addDomain';
 
 
-const TableViewComponent = ( rowData ) => {
-    console.log(rowData)
+const TableViewComponent = ( {rowData, handleNewRowData} ) => {
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
@@ -23,6 +22,7 @@ const TableViewComponent = ( rowData ) => {
     const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
     const [addDomainError, setAddDomainError] = useState('');
     const [isAddAfterCheck, setIsAddAfterCheck] = useState(false);
+    const [newDomainDetail, setNewDomainDetail] = useState({});
 
     const defaultColDef = useMemo(() => {
         return {
@@ -125,12 +125,14 @@ const TableViewComponent = ( rowData ) => {
     };
 
     const isDomainNamePresent = () => {
-        return rowData.rowData.some(item => item.domain === addDomainName);
+        if (rowData){
+            return rowData.some(item => item.domain === addDomainName);
+        }
+        return false;
     };
 
     const handleSubmitAddDomain = async () => {
         try {
-            
             await axios.post('http://localhost:5000/api/add-domain', {
                 email: localStorage.getItem("userEmail"),
                 domain: addDomainName,
@@ -142,6 +144,18 @@ const TableViewComponent = ( rowData ) => {
                 lastEmailSent: null        
             });       
             setAddDomainError('');
+            setNewDomainDetail(
+                {
+                    email: localStorage.getItem("userEmail"),
+                    domain: addDomainName,
+                    issuer: addDomainIssuer,
+                    expiryDate: addDomainExpiry,
+                    isNotified: isNotificationEnabled,
+                    daysBeforeNotified: isNotificationEnabled ? notificationDays : null,
+                    inNotificationPeriod: false,
+                    lastEmailSent: null  
+                }
+            );
         } catch (err) {
             setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
         }
@@ -174,6 +188,11 @@ const TableViewComponent = ( rowData ) => {
         }
     };
 
+    useEffect (() => {
+        if(newDomainDetail && Object.keys(newDomainDetail).length !== 0) {
+            handleNewRowData(newDomainDetail);
+        }
+    }, [newDomainDetail]);
 
     useEffect (() => {
         if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent()) {
@@ -197,7 +216,12 @@ const TableViewComponent = ( rowData ) => {
                     />
                 </div>
                 <div className='flex gap-4'>
+                    
+                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Update</button>
+                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Delete</button>
+                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Refresh</button>
 
+                    <div className="border-r-2 border-teal-200"></div>
                     <button
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
                         onClick={handleOpenAddDomainDialog}>Add Domain
@@ -212,10 +236,6 @@ const TableViewComponent = ( rowData ) => {
                             handleSubmitAddDomain={getDomainDetails}
                             domainNameError={addDomainError} isAddAfterCheck={isAddAfterCheck} />
                     }
-                    
-                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Save</button>
-                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Delete</button>
-                    <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Refresh</button>
 
                     <button
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
@@ -239,7 +259,7 @@ const TableViewComponent = ( rowData ) => {
                 <div style={gridStyle} className="ag-theme-alpine">
                     <AgGridReact
                         ref={gridRef}
-                        rowData={rowData.rowData}
+                        rowData={rowData}
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         rowSelection={'multiple'}
