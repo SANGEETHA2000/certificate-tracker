@@ -9,6 +9,7 @@ import AddDomainDialogComponent from './addDomain/addDomain';
 
 
 const TableViewComponent = ( rowData ) => {
+    console.log(rowData)
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
@@ -18,7 +19,7 @@ const TableViewComponent = ( rowData ) => {
     const [addDomainIssuer, setAddDomainIssuer] = useState('');
     const [addDomainValidFrom, setAddDomainValidFrom] = useState('');
     const [addDomainExpiry, setAddDomainExpiry] = useState('');
-    const [notificationDays, setNotificationDays] = useState('30');
+    const [notificationDays, setNotificationDays] = useState(30);
     const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
     const [addDomainError, setAddDomainError] = useState('');
     const [isAddAfterCheck, setIsAddAfterCheck] = useState(false);
@@ -129,6 +130,7 @@ const TableViewComponent = ( rowData ) => {
 
     const handleSubmitAddDomain = async () => {
         try {
+            
             await axios.post('http://localhost:5000/api/add-domain', {
                 email: localStorage.getItem("userEmail"),
                 domain: addDomainName,

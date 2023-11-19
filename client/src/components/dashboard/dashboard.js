@@ -22,6 +22,10 @@ const Dashboard = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        setUserData
+    }, [userData]);
+
     return (
         <div className="flex flex-col w-full h-full">
             <div className="flex flex-row basis-1/12 bg-teal-600 justify-between px-4">

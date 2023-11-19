@@ -38,11 +38,12 @@ const AddDomainDialogComponent = ({ openAddDomainDialog,
                         <div className='flex flex-row justify-start'>
                             <label className='pr-4 text-lg w-7/12'>No. of days before you would like to get notified</label>
                             <input
-                                type="text" id="notificationDays" name="notificationDays"
+                                type="number" id="notificationDays" name="notificationDays"
                                 className='w-5/12 outline-0 p-1 border-2 border-teal-400 border-solid focus-within:border-teal-500'
                                 value={notificationDays}
                                 onChange={setNotificationDays}
                                 autoFocus={true}
+                                min="1" max="90"
                             />
                         </div>
                     )}
