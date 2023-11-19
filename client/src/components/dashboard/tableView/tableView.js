@@ -1,24 +1,28 @@
+import "./tableView.css"
+import axios from 'axios';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
-import React, {
-    useMemo,
-    useState,
-    useCallback,
-    useRef,
-  } from 'react';
-import getData from '../data';
-import "./tableView.css";
+import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import CheckCertificateDetailsDialogComponent from './checkCertificateDetails/checkCertificateDetails';
 import AddDomainDialogComponent from './addDomain/addDomain';
 
-const TableViewComponent = () => {
+
+const TableViewComponent = ( rowData ) => {
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
     const [isCheckCertificateDetailsOpen, setIsCheckCertificateDetailsOpen] = useState(false);
     const [isAddDomainOpen, setIsAddDomainOpen] = useState(false);
-    const [rowData, setRowData] = useState(getData());
+    const [addDomainName, setAddDomainName] = useState('');
+    const [addDomainIssuer, setAddDomainIssuer] = useState('');
+    const [addDomainValidFrom, setAddDomainValidFrom] = useState('');
+    const [addDomainExpiry, setAddDomainExpiry] = useState('');
+    const [notificationDays, setNotificationDays] = useState('30');
+    const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
+    const [addDomainError, setAddDomainError] = useState('');
+    const [isAddAfterCheck, setIsAddAfterCheck] = useState(false);
+
     const defaultColDef = useMemo(() => {
         return {
             sortable: true,
@@ -44,7 +48,7 @@ const TableViewComponent = () => {
     }
 
     const cellClassRules = {
-        "alreadyExpired": params => params.value == "Already Expired!",
+        "alreadyExpired": params => params.value === "Already Expired!",
         "expiringSoon": params => params.value.substring(0, params.value.indexOf(' ')) <= 30,
         "otherDomains": params => params.value.substring(0, params.value.indexOf(' ')) > 30
     };
@@ -76,13 +80,108 @@ const TableViewComponent = () => {
         setIsCheckCertificateDetailsOpen(false);
     };
 
+    const handleCloseCheckCertificateDetailsDialogAndClearData = () => {
+        setIsCheckCertificateDetailsOpen(false);
+        setAddDomainName("");
+        setAddDomainValidFrom("");
+        setAddDomainExpiry("");
+        setAddDomainIssuer("");
+        setAddDomainError('');
+    };
+
+    function handleChangeAddDomainName(e) {
+        setAddDomainName(e.target.value);
+    }
+
     const handleOpenAddDomainDialog = () => {
         setIsAddDomainOpen(true);
     };
 
+    function handleNotificationDays(e) {
+        setNotificationDays(e.target.value);
+    }
+
+    function handleNotificationEnabled() {
+        setIsNotificationEnabled(!isNotificationEnabled);
+    }
+
+    function handleMonitorDomain() {
+        setIsAddAfterCheck(true);
+        handleCloseCheckCertificateDetailsDialog();
+        handleOpenAddDomainDialog();
+    }
+
     const handleCloseAddDomainDialog = () => {
         setIsAddDomainOpen(false);
+        setIsAddAfterCheck(false);
+        setAddDomainName("");
+        setAddDomainValidFrom("");
+        setAddDomainExpiry("");
+        setAddDomainIssuer("");
+        setIsNotificationEnabled(false);
+        setNotificationDays(30);
+        setAddDomainError('');
     };
+
+    const isDomainNamePresent = () => {
+        return rowData.rowData.some(item => item.domain === addDomainName);
+    };
+
+    const handleSubmitAddDomain = async () => {
+        try {
+            await axios.post('http://localhost:5000/api/add-domain', {
+                email: localStorage.getItem("userEmail"),
+                domain: addDomainName,
+                issuer: addDomainIssuer,
+                expiryDate: addDomainExpiry,
+                isNotified: isNotificationEnabled,
+                daysBeforeNotified: isNotificationEnabled ? notificationDays : null,
+                inNotificationPeriod: false,
+                lastEmailSent: null        
+            });       
+            setAddDomainError('');
+        } catch (err) {
+            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+        }
+        handleCloseAddDomainDialog();
+    }
+
+    const getDomainDetails = async () => {
+        if (!isAddAfterCheck) {
+            await axios
+            .get(`http://localhost:5000/api/domain-certificate?domain=${addDomainName}`)
+            .then((response) => {
+                setAddDomainIssuer(response.data.issuer);
+                setAddDomainValidFrom(response.data.valid_from);
+                setAddDomainExpiry(response.data.valid_until);
+                setAddDomainError('');
+            })
+            .catch((err) => {
+                setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+                setAddDomainIssuer('');
+                setAddDomainValidFrom('');
+                setAddDomainExpiry('');
+            });
+        }
+        else {
+            if (!isDomainNamePresent()) {
+                handleSubmitAddDomain();
+            } else {
+                setAddDomainError('Domain is already being monitored!');
+            }
+        }
+    };
+
+
+    useEffect (() => {
+        if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent()) {
+            handleSubmitAddDomain();
+        }
+        else if(isDomainNamePresent()) {
+            setAddDomainError('Domain is already being monitored!');
+        }
+    }, [ addDomainExpiry, addDomainIssuer ]);
+    
 
     return (
         <div className='bg-white w-full h-full flex flex-col'>
@@ -101,8 +200,17 @@ const TableViewComponent = () => {
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
                         onClick={handleOpenAddDomainDialog}>Add Domain
                     </button>
-                    <AddDomainDialogComponent open={isAddDomainOpen} handleClose={handleCloseAddDomainDialog} />
-
+                    {isAddDomainOpen &&
+                        <AddDomainDialogComponent
+                            openAddDomainDialog={isAddDomainOpen}
+                            handleCloseAddDomainDialog={handleCloseAddDomainDialog}
+                            addDomainName={addDomainName} setAddDomainName={handleChangeAddDomainName}
+                            notificationDays={notificationDays} setNotificationDays={handleNotificationDays}
+                            isNotificationEnabled={isNotificationEnabled} setIsNotificationEnabled={handleNotificationEnabled}
+                            handleSubmitAddDomain={getDomainDetails}
+                            domainNameError={addDomainError} isAddAfterCheck={isAddAfterCheck} />
+                    }
+                    
                     <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Save</button>
                     <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Delete</button>
                     <button className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'>Refresh</button>
@@ -111,15 +219,25 @@ const TableViewComponent = () => {
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
                         onClick={handleOpenCheckCertificateDetailsDialog}>Check Certificate Details
                     </button>
-                    <CheckCertificateDetailsDialogComponent open={isCheckCertificateDetailsOpen} handleClose={handleCloseCheckCertificateDetailsDialog} />
-                    
+                    {isCheckCertificateDetailsOpen &&
+                        <CheckCertificateDetailsDialogComponent
+                            openCheckCertificateDetailsDialog={isCheckCertificateDetailsOpen}
+                            handleCloseCheckCertificateDetailsDialog={handleCloseCheckCertificateDetailsDialog}
+                            handleCloseCheckCertificateDetailsDialogAndClearData={handleCloseCheckCertificateDetailsDialogAndClearData}
+                            checkDomainName={addDomainName} setCheckDomainName={handleChangeAddDomainName}
+                            handleSubmitCheckDetails={getDomainDetails}
+                            checkDomainIssuer={addDomainIssuer} checkDomainExpiry={addDomainExpiry} checkDomainValidFrom={addDomainValidFrom}
+                            handleMonitorDomain={handleMonitorDomain}
+                            domainNameError={addDomainError} />
+                    }
+
                 </div>
             </div>
             <div style={containerStyle} className='p-3'>
                 <div style={gridStyle} className="ag-theme-alpine">
                     <AgGridReact
                         ref={gridRef}
-                        rowData={rowData}
+                        rowData={rowData.rowData}
                         columnDefs={columnDefs}
                         defaultColDef={defaultColDef}
                         rowSelection={'multiple'}

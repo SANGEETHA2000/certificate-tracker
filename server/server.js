@@ -21,7 +21,7 @@ app.use(cors());
 app.use(domainRoutes);
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://sangeetha2000vd:San755t81@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
+mongoose.connect('mongodb+srv://sangeetha2000vd:<password>@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB')
 .then(() => {
   console.log('Connected to MongoDB');
 })

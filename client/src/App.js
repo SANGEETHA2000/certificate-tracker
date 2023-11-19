@@ -1,55 +1,30 @@
 import './App.css';
-import LoaderComponent from './components/loader';
-import LoginComponent from './components/login';
-import DashboardComponent from './components/dashboard/dashboard';
-import React, { useState, useEffect } from 'react'; 
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Loading from './pages/loader';
+import NotFound from './pages/notFound';
+import Login from './components/login';
+import Dashboard from './components/dashboard/dashboard';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+import PrivateRoute from './router/privateRoute';
 
-function App() {
+const App = () => {
 
-  // const [loading, setLoading] = useState(true);
-  // const [userEmail, setUserEmail] = useState(null);
-  // console.log(userEmail);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const storedEmail = localStorage.getItem('userEmail');
-  //       await new Promise(resolve => setTimeout(resolve, 2000));
-  //       setUserEmail(storedEmail);
-  //       setLoading(false);
-  //     } catch (error) {
-  //         console.error('Error fetching data:', error);
-  //         setLoading(false);
-  //     }
-  //   };
-  //   fetchData();
-  // }, []);
-
-  // useEffect(() => {
-  //   const storedEmail = localStorage.getItem('userEmail');
-  //   setUserEmail(storedEmail);
-  //   setLoading(false);
-  // }, []);
+  const isLoggedIn = localStorage.getItem('userEmail') !== null;
 
   return (
     <div className='h-screen w-screen'>
-      <Router>
+      <BrowserRouter>
         <Routes>
-          <Route
-            path="/dashboard"
-            element={<DashboardComponent />}
-          />
-          <Route
-            path="/login"
-            element={<LoginComponent />}
-          />
-          <Route
-            path="/"
-            element={<LoginComponent />}
-          />
+          {isLoggedIn &&
+            <>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
+              <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+            </>}
+          <Route path="/dashboard" loader={Loading} element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
+          <Route path="/login" loader={Loading} element={<Login />} />
+          <Route path="/" loader={Loading} element={<Login />} />
+          <Route path="*" loader={Loading} element={<NotFound />} />
         </Routes>
-      </Router>
+      </BrowserRouter>
     </div>
   );
 }

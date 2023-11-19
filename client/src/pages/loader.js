@@ -1,7 +1,7 @@
 import React, { useState, useEffect  } from 'react';
 import appLogo from '../assets/logo.png';
 
-const LoaderComponent = () => {
+const Loading = () => {
 
     const [dots, setDots] = useState('');
 
@@ -18,7 +18,7 @@ const LoaderComponent = () => {
     }, []); // Empty dependency array to run the effect only once on mount
 
     return (
-        <div className="bg-white h-full w-full items-center justify-center flex flex-col opacity-50">
+        <div className="bg-white h-full w-full items-center justify-center flex flex-col">
             <div className="shadow-xl shadow-teal-100 h-16 w-16">
                 <img src={appLogo} alt="SSL Monitor Logo" />
             </div>
@@ -29,4 +29,4 @@ const LoaderComponent = () => {
     )
 }
 
-export default LoaderComponent;
+export default Loading;

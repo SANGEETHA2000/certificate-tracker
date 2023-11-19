@@ -1,31 +1,70 @@
 import React, { useState } from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
-import DialogActions from '@mui/material/DialogActions';
-import Button from '@mui/material/DialogTitle';
-import axios from 'axios';
 
-const AddDomainDialogComponent = ({ open, handleClose, domainName }) => {
+const AddDomainDialogComponent = ({ openAddDomainDialog,
+                                    handleCloseAddDomainDialog,
+                                    addDomainName, setAddDomainName,
+                                    notificationDays, setNotificationDays,
+                                    isNotificationEnabled, setIsNotificationEnabled,
+                                    handleSubmitAddDomain,
+                                    domainNameError, isAddAfterCheck }) => {
+
     return (
-        <Dialog open={open} onClose={handleClose}> 
-            <DialogTitle> 
-            Greetings from GeeksforGeeks {domainName}
-            </DialogTitle> 
-            <DialogContent> 
-            <DialogContentText> 
-                Do you do coding ? 
-            </DialogContentText> 
+        <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true} maxWidth={'sm'}> 
+            <DialogTitle>Add a new domain to monitor</DialogTitle> 
+            <DialogContent className='flex flex-col gap-5'>
+                <form className='flex flex-col gap-4'>
+                    <div className='flex flex-row justify-start'>
+                        <label className='pr-4 text-lg w-7/12'>Domain name</label>
+                        <input
+                            type="text" id="domain" name="domain"
+                            className='w-5/12 outline-0 p-1 border-2 border-teal-400 border-solid focus-within:border-teal-500'
+                            value={addDomainName}
+                            onChange={setAddDomainName}
+                            disabled={isAddAfterCheck}
+                        />
+                    </div>
+                    <div className='flex flex-row justify-start'>
+                        <label className='pr-4 text-lg w-7/12'>Receive notification closer to expiry</label>
+                        <input
+                            type="checkbox" id="notification" name="notification"
+                            checked={isNotificationEnabled}
+                            onChange={setIsNotificationEnabled}
+                        />
+                    </div>
+                    {isNotificationEnabled && (
+                        <div className='flex flex-row justify-start'>
+                            <label className='pr-4 text-lg w-7/12'>No. of days before you would like to get notified</label>
+                            <input
+                                type="text" id="notificationDays" name="notificationDays"
+                                className='w-5/12 outline-0 p-1 border-2 border-teal-400 border-solid focus-within:border-teal-500'
+                                value={notificationDays}
+                                onChange={setNotificationDays}
+                                autoFocus={true}
+                            />
+                        </div>
+                    )}
+                </form>
+                {domainNameError && (
+                    <p className='text-red-700 text-center'>{domainNameError}</p>
+                )}
             </DialogContent> 
-            <DialogActions> 
-            <Button onClick={handleClose} color="primary"> 
-            Close 
-            </Button> 
-            <Button onClick={handleClose} color="primary" autoFocus> 
-            Yes 
-            </Button> 
-            </DialogActions> 
+            <div className='flex flex-row p-5'>
+                <div className='flex w-1/2 item-center justify-center'>
+                    <button
+                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
+                        onClick={handleSubmitAddDomain}
+                    >Submit</button>
+                </div>
+                <div className='flex w-1/2 item-center justify-center'>
+                    <button
+                        className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
+                        onClick={handleCloseAddDomainDialog}
+                    >Cancel</button>
+                </div>
+            </div>
         </Dialog>
     )
 }

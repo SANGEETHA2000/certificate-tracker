@@ -2,15 +2,22 @@ import appLogo from '../assets/logo.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const LoginComponent = () => {
+const Login = () => {
     const [email, setEmail] = useState('');
+    const [isValidEmail, setIsValidEmail] = useState(true);
     const navigate = useNavigate();
 
     const handleEmailSubmit = (e) => {
         e.preventDefault();
-        localStorage.setItem('userEmail', email);
-        console.log('Email stored:', email);
-        navigate('/dashboard');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const isValid = emailRegex.test(email);
+        if (isValid) {
+            localStorage.setItem('userEmail', email);
+            navigate('/dashboard');
+        } else {
+            setIsValidEmail(false);
+        }
+        
     };
 
     return (
@@ -35,7 +42,10 @@ const LoginComponent = () => {
                             placeholder="Enter your email address"
                             className='outline-0 w-10/12 p-2'
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => {
+                                setEmail(e.target.value);
+                                setIsValidEmail(true);
+                            }}
                             required
                         />
                         <button
@@ -47,10 +57,13 @@ const LoginComponent = () => {
                             </svg>
                         </button>              
                     </form>
+                    {!isValidEmail && (
+                        <p className='text-red-500 text-sm'>Please enter a valid email address!</p>
+                    )}
                 </div>
             </div>
         </div>
     )
 }
 
-export default LoginComponent;
+export default Login;

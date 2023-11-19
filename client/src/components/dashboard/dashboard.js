@@ -1,10 +1,26 @@
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import appLogo from '../../assets/logo.png';
 import TableViewComponent from './tableView/tableView';
 
-const DashboardComponent = () => {
-    // componentDidMount = () => {
 
-    // }
+const Dashboard = () => {
+    const [userData, setUserData] = useState([]);
+    const [userDataError, setUserDataError] = useState('');
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(`http://localhost:5000/api/getDomainList?userEmail=${localStorage.getItem("userEmail")}`);
+                setUserData(response.data);
+                setUserDataError('');
+            } catch (err) {
+                setUserDataError(err.response?.data?.error || 'An unexpected error occurred!');
+                setUserData([]);
+            }
+        };
+        fetchData();
+    }, []);
 
     return (
         <div className="flex flex-col w-full h-full">
@@ -22,11 +38,22 @@ const DashboardComponent = () => {
 
                 </div>
                 <div className='flex basis-4/5 bg-teal-50 p-5'>
-                    <TableViewComponent />
+                    {!userDataError && (
+                        <TableViewComponent rowData={userData} />
+                    )}
+                    {userDataError && (
+                        <div className='flex flex-col items-center justify-center gap-6 pb-5 h-full w-full'>
+                            <p className='text-red-700 text-2xl'>{userDataError}</p>
+                            {/* <button
+                                className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
+                                onClick={handleClose}
+                            >Close</button> */}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
     )
 }
 
-export default DashboardComponent;
+export default Dashboard;
