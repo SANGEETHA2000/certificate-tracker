@@ -69,6 +69,24 @@ async function addDomain(req, res) {
     });
 }
 
+async function deleteDomains(req, res) {
+  console.log(req)
+  const domainsToDelete = req.body.domains;
+  if (!domainsToDelete || !Array.isArray(domainsToDelete) || domainsToDelete.length === 0) {
+    return res.status(400).json({ success: false, message: 'Invalid or empty domains list' });
+  }
+  try {
+    const deleteResult = await DomainDetail.deleteMany({ domain: { $in: domainsToDelete } });
+    if (deleteResult.deletedCount > 0) {
+      res.json({ success: true, deletedCount: deleteResult.deletedCount });
+    } else {
+      res.status(404).json({ success: false, message: 'No matching records found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal server error' + error });
+  }
+}
+
 async function checkDatabaseAndSendEmails() {
   try {
     // Get the current date
@@ -105,5 +123,6 @@ module.exports = {
   getCertificateDetails,
   addDomain,
   checkDatabaseAndSendEmails,
-  getDomainList
+  getDomainList,
+  deleteDomains
 };

@@ -29,6 +29,11 @@ const Dashboard = () => {
         ]);
     }
 
+    const handleDeleteDomainData = (rowsSelected) => {
+        const dataAfterDeletion = userData.filter(item => !rowsSelected.includes(item.domain));
+        setUserData(dataAfterDeletion);
+    }
+
     return (
         <div className="flex flex-col w-full h-full">
             <div className="flex flex-row basis-1/12 bg-teal-600 justify-between px-4">
@@ -46,7 +51,10 @@ const Dashboard = () => {
                 </div>
                 <div className='flex basis-4/5 bg-teal-50 p-5'>
                     {!userDataError && (
-                        <TableViewComponent rowData={userData} handleNewRowData={handleNewRowData}/>
+                        <TableViewComponent
+                            rowData={userData}
+                            handleNewRowData={handleNewRowData}
+                            handleDeleteDomainData={handleDeleteDomainData}/>
                     )}
                     {userDataError && (
                         <div className='flex flex-col items-center justify-center gap-6 pb-5 h-full w-full'>
