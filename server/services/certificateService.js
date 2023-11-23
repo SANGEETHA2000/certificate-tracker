@@ -44,6 +44,67 @@ async function getCertificateDetails(req, res) {
   });
 }
 
+async function putDomainCertificateDetails(id, details) {
+  try {
+    const updated = await DomainDetail.findOneAndUpdate(
+                      { _id: id },
+                      { $set: details },
+                      { new: true }
+                    );
+    return updated;
+  } catch (error) {
+    // code to handle error
+  }
+}
+
+async function updateDomainCertificateDetails(req, res) {
+  const updateField = req.body.field;
+  const domainsToUpdate = req.body.domains;
+  let details = {};
+
+  if (!domainsToUpdate || !Array.isArray(domainsToUpdate) || domainsToUpdate.length === 0) {
+    return res.status(400).json({ success: false, message: 'Invalid or empty domains list' });
+  }
+
+  try {
+    await Promise.all(domainsToUpdate.map(async (domainItem) => {
+      if (updateField === "expiry") {
+        const options = {
+          host: domainItem.domain,
+          port: 443,
+          method: 'GET',
+          rejectUnauthorized: false,
+          servername: domainItem.domain,
+        };
+
+        const cert = await new Promise((resolve, reject) => {
+          const secureSocket = tls.connect(options, () => {
+            resolve(secureSocket.getPeerCertificate());
+            secureSocket.end();
+          });
+          secureSocket.on('error', reject);
+        });
+
+        details = {
+          valid_from: cert.valid_from,
+          valid_until: cert.valid_to,
+          issuer: cert.issuer.O
+        };
+      } else if (updateField === "notifications") {
+        details = {
+          isNotified: domainItem.isNotified,
+          daysBeforeNotified: domainItem.daysBeforeNotified
+        };
+      }
+      await putDomainCertificateDetails(domainItem._id, details);
+    }));
+    const finalUpdatedResults = await DomainDetail.find({ _id: { $in: domainsToUpdate } });
+    res.json({ updated: finalUpdatedResults });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Internal server error', error: error });
+  }
+}
+
 async function getDomainList(req, res) {
   const userEmail = req.query.userEmail;
   if (!userEmail) {
@@ -70,13 +131,12 @@ async function addDomain(req, res) {
 }
 
 async function deleteDomains(req, res) {
-  console.log(req)
   const domainsToDelete = req.body.domains;
   if (!domainsToDelete || !Array.isArray(domainsToDelete) || domainsToDelete.length === 0) {
     return res.status(400).json({ success: false, message: 'Invalid or empty domains list' });
   }
   try {
-    const deleteResult = await DomainDetail.deleteMany({ domain: { $in: domainsToDelete } });
+    const deleteResult = await DomainDetail.deleteMany({ _id: { $in: domainsToDelete } });
     if (deleteResult.deletedCount > 0) {
       res.json({ success: true, deletedCount: deleteResult.deletedCount });
     } else {
@@ -121,6 +181,7 @@ async function checkDatabaseAndSendEmails() {
 
 module.exports = {
   getCertificateDetails,
+  updateDomainCertificateDetails,
   addDomain,
   checkDatabaseAndSendEmails,
   getDomainList,

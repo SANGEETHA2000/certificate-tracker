@@ -7,18 +7,19 @@ import TableViewComponent from './tableView/tableView';
 const Dashboard = () => {
     const [userData, setUserData] = useState([]);
     const [userDataError, setUserDataError] = useState('');
+
+    const fetchData = async () => {
+        try {
+            const response = await axios.get(`http://localhost:5000/api/get-domains-list?userEmail=${localStorage.getItem("userEmail")}`);
+            setUserData(response.data);
+            setUserDataError('');
+        } catch (err) {
+            setUserDataError(err.response?.data?.error || 'An unexpected error occurred!');
+            setUserData([]);
+        }
+    };
     
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/getDomainList?userEmail=${localStorage.getItem("userEmail")}`);
-                setUserData(response.data);
-                setUserDataError('');
-            } catch (err) {
-                setUserDataError(err.response?.data?.error || 'An unexpected error occurred!');
-                setUserData([]);
-            }
-        };
+    useEffect(() => {       
         fetchData();
     }, []);
 
@@ -29,9 +30,17 @@ const Dashboard = () => {
         ]);
     }
 
-    const handleDeleteDomainData = (rowsSelected) => {
-        const dataAfterDeletion = userData.filter(item => !rowsSelected.includes(item.domain));
+    const handleDeleteRowData = (deletionRowsSelected) => {
+        const dataAfterDeletion = userData.filter(item => !deletionRowsSelected.includes(item._id));
         setUserData(dataAfterDeletion);
+    }
+
+    const handleRefreshRowData = (updatedRecords) => {
+        const updatedRowData = userData.map(row => {
+            const updatedRow = updatedRecords.find(updated => updated._id === row._id);
+            return updatedRow ? { ...row, ...updatedRow } : row;
+        });
+        setUserData(updatedRowData);
     }
 
     return (
@@ -54,7 +63,8 @@ const Dashboard = () => {
                         <TableViewComponent
                             rowData={userData}
                             handleNewRowData={handleNewRowData}
-                            handleDeleteDomainData={handleDeleteDomainData}/>
+                            handleDeleteRowData={handleDeleteRowData}
+                            handleRefreshRowData={handleRefreshRowData}/>
                     )}
                     {userDataError && (
                         <div className='flex flex-col items-center justify-center gap-6 pb-5 h-full w-full'>

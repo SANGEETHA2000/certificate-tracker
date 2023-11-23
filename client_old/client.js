@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const domain = certificateForm.elements['domain'].value;
 
         // Make the API request
-        const response = await fetch(`/api/domain-certificate?domain=${domain}`);
+        const response = await fetch(`api/get-domain-certificate-details?domain=${domain}`);
 
         if (response.status == 200) {
 

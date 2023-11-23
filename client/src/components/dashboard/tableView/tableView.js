@@ -8,7 +8,7 @@ import CheckCertificateDetailsDialogComponent from './checkCertificateDetails/ch
 import AddDomainDialogComponent from './addDomain/addDomain';
 
 
-const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData } ) => {
+const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefreshRowData } ) => {
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
@@ -23,8 +23,11 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
     const [addDomainError, setAddDomainError] = useState('');
     const [isAddAfterCheck, setIsAddAfterCheck] = useState(false);
     const [newDomainDetail, setNewDomainDetail] = useState({});
-    const [rowsSelected, setRowsSelected] = useState([]);
+    const [deletionRowsSelected, setDeletionRowsSelected] = useState([]);
     const [isRefreshDeleteEnabled, setIsRefreshDeleteEnabled] = useState(false);
+    const [refreshRowsSelected, setRefreshRowsSelected] = useState([]);
+    const [isModifyEnabled, setIsModifyEnabled] = useState(false);
+    const [modifiedRows, setModifiedRows] = useState([]);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -167,7 +170,7 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
     const getDomainDetails = async () => {
         if (!isAddAfterCheck) {
             await axios
-            .get(`http://localhost:5000/api/domain-certificate?domain=${addDomainName}`)
+            .get(`http://localhost:5000api/get-domain-certificate-details?domain=${addDomainName}`)
             .then((response) => {
                 setAddDomainIssuer(response.data.issuer);
                 setAddDomainValidFrom(response.data.valid_from);
@@ -207,16 +210,20 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
     
     const onSelectionChanged = useCallback((event) => {
         event.api.getSelectedNodes().length > 0 ? setIsRefreshDeleteEnabled(true) : setIsRefreshDeleteEnabled(false);
-        setRowsSelected(event.api.getSelectedNodes().map(item => item.data.domain));
+        setDeletionRowsSelected(event.api.getSelectedNodes().map(item => item.data._id));
+        setRefreshRowsSelected(event.api.getSelectedNodes().map(item => ({
+            domain : item.data.domain,
+            _id: item.data._id
+        })));
     }, []);
 
     const handleOnDeleteClicked = async () => {
         try {
             await axios.delete('http://localhost:5000/api/delete-domains', {
-                data: { domains: rowsSelected }
+                data: { domains: deletionRowsSelected }
             });
-            handleDeleteDomainData(rowsSelected);
-            setRowsSelected([]);
+            handleDeleteRowData(deletionRowsSelected);
+            setDeletionRowsSelected([]);
             setAddDomainError('');
             setIsRefreshDeleteEnabled(false);
         } catch (err) {
@@ -225,8 +232,65 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
     }
 
     const handleOnRefreshClicked = async () => {
-        
+        try {
+            const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
+                field: "expiry", "domains": refreshRowsSelected 
+            });
+            handleRefreshRowData(response.data.updated);
+            setRefreshRowsSelected([]);
+            setAddDomainError('');
+            setIsRefreshDeleteEnabled(false);
+        } catch (err) {
+            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+        }
     }
+
+    const handleOnModifyClicked = async () => {
+        try {
+            const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
+                field: "notifications", "domains": modifiedRows
+            });
+            handleRefreshRowData(response.data.updated);
+            setModifiedRows([]);
+            setAddDomainError('');
+            setIsModifyEnabled(false);
+        } catch (err) {
+            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+        }
+    }
+
+    const handleCellEditingStarted = event => {
+        setIsModifyEnabled(true);
+        const { node, data } = event;
+        const modifiedRow = { _id: data._id, updatedData: data };
+        const existingIndex = modifiedRows.findIndex(row => row._id === data._id);
+        if (existingIndex !== -1) {
+          const updatedmodifiedRows = [...modifiedRows];
+          updatedmodifiedRows[existingIndex] = modifiedRow;
+          setModifiedRows(updatedmodifiedRows);
+        } else {
+          setModifiedRows(prev => [...prev, modifiedRow]);
+        }
+    };
+
+    const handleCellValueChanged = event => {
+        setIsModifyEnabled(true);
+        const { node, data } = event;
+        const modifiedRow = { _id: data._id, updatedData: data };
+        const existingIndex = modifiedRows.findIndex(row => row._id === data._id);
+        if (existingIndex !== -1) {
+          const updatedmodifiedRows = [...modifiedRows];
+          updatedmodifiedRows[existingIndex] = modifiedRow;
+          setModifiedRows(updatedmodifiedRows);
+        } else {
+          setModifiedRows(prev => [...prev, modifiedRow]);
+        }
+    };
+
+    const getRowStyle = params => {
+        const modifiedRow = modifiedRows.find(row => row._id === params.data._id);
+        return modifiedRow ? { background: 'lightyellow' } : null;
+    };
 
     return (
         <div className='bg-white w-full h-full flex flex-col'>
@@ -242,14 +306,17 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
                 <div className='flex gap-4'>
                     
                     <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'>Modify</button>
+                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
+                        disabled={!isModifyEnabled}
+                        onClick={handleOnModifyClicked}>Modify</button>
                     <button
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
                         disabled={!isRefreshDeleteEnabled}
                         onClick={handleOnDeleteClicked}>Delete</button>
                     <button
                         className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
-                        disabled={!isRefreshDeleteEnabled}>Refresh</button>
+                        disabled={!isRefreshDeleteEnabled}
+                        onClick={handleOnRefreshClicked}>Refresh</button>
 
                     <div className="border-r-2 border-teal-200"></div>
                     <button
@@ -294,7 +361,10 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteDomainData
                         defaultColDef={defaultColDef}
                         rowSelection={'multiple'}
                         suppressRowClickSelection={true}
-                        onSelectionChanged={onSelectionChanged}  
+                        onSelectionChanged={onSelectionChanged}
+                        onCellEditingStarted={handleCellEditingStarted}
+                        onCellValueChanged={handleCellValueChanged}
+                        getRowStyle={getRowStyle}
                     />
                 </div>
             </div>
