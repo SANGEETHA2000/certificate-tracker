@@ -92,9 +92,10 @@ async function updateDomainCertificateDetails(req, res) {
         };
       } else if (updateField === "notifications") {
         details = {
-          isNotified: domainItem.isNotified,
-          daysBeforeNotified: domainItem.daysBeforeNotified
+          isNotified: domainItem.updatedData.isNotified,
+          daysBeforeNotified: domainItem.updatedData.daysBeforeNotified
         };
+        console.log(details);
       }
       await putDomainCertificateDetails(domainItem._id, details);
     }));

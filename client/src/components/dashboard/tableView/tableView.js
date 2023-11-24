@@ -8,7 +8,7 @@ import CheckCertificateDetailsDialogComponent from './checkCertificateDetails/ch
 import AddDomainDialogComponent from './addDomain/addDomain';
 
 
-const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefreshRowData } ) => {
+const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefreshRowData } ) => {
     const gridRef = useRef();
     const containerStyle = useMemo(() => ({ width: '100%', height: '100%' }), []);
     const gridStyle = useMemo(() => ({ height: '100%', width: '100%' }), []);
@@ -28,6 +28,7 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, h
     const [refreshRowsSelected, setRefreshRowsSelected] = useState([]);
     const [isModifyEnabled, setIsModifyEnabled] = useState(false);
     const [modifiedRows, setModifiedRows] = useState([]);
+    const [hasModified, setHasModified] = useState(true);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -68,7 +69,7 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, h
         { field: 'issuer' },
         { field: 'expiryDate' },
         { field: 'isNotified', headerName: 'Receive Notifications', editable: true },
-        { field: 'daysBeforeNotified', editable: customEditDaysBeforeNotified, valueGetter: daysBeforeNotified },
+        { field: 'daysBeforeNotified', editable: customEditDaysBeforeNotified, valueGetter: daysBeforeNotified, valueParser: params => Number(params.newValue) },
         { headerName: 'Expiry Status', valueGetter: noOfDaysLeftForExpiry, cellClassRules: cellClassRules, cellRenderer: cellRenderer }
     ]);
 
@@ -246,50 +247,55 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, h
     }
 
     const handleOnModifyClicked = async () => {
+        console.log(modifiedRows)
         try {
             const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
                 field: "notifications", "domains": modifiedRows
             });
+            console.log(response);
             handleRefreshRowData(response.data.updated);
             setModifiedRows([]);
             setAddDomainError('');
             setIsModifyEnabled(false);
+            const gridApi = gridRef.current.api; // Assuming you have the grid API reference
+            const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified']; // Replace with your column field names
+            console.log(gridApi)
+            columnsToRemoveStyle.forEach(column => {
+                const columnApi = gridApi.getColumnApi();
+                const colDef = columnApi.getColumn(column).getColDef();
+                colDef.cellStyle = null; // Remove cell style
+            });
+
+            gridApi.redrawRows(); // Redraw rows to reflect style changes
         } catch (err) {
             setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
         }
-    }
+    } 
 
-    const handleCellEditingStarted = event => {
+    const handleCellValueChanged = (params) => {
+        console.log(params);
         setIsModifyEnabled(true);
-        const { node, data } = event;
-        const modifiedRow = { _id: data._id, updatedData: data };
-        const existingIndex = modifiedRows.findIndex(row => row._id === data._id);
-        if (existingIndex !== -1) {
-          const updatedmodifiedRows = [...modifiedRows];
-          updatedmodifiedRows[existingIndex] = modifiedRow;
-          setModifiedRows(updatedmodifiedRows);
-        } else {
-          setModifiedRows(prev => [...prev, modifiedRow]);
+        if (params.oldValue !== params.newValue) {
+            if (typeof params.value === 'boolean') {
+                params.data.daysBeforeNotified = params.value ? 30 : null;
+            }
+            var column = params.column.colDef.field;
+            params.column.colDef.cellStyle = { 'backgroundColor': 'lightyellow' };
+            params.api.refreshCells({
+                force: true,
+                columns: [column],
+                rowNodes: [params.node]
+            });
+            const modifiedRow = { _id: params.data._id, updatedData: params.data };
+            const existingIndex = modifiedRows.findIndex(row => row._id ===params.data._id);
+            if (existingIndex !== -1) {
+                const updatedmodifiedRows = [...modifiedRows];
+                updatedmodifiedRows[existingIndex] = modifiedRow;
+                setModifiedRows(updatedmodifiedRows);
+            } else {
+                setModifiedRows(prev => [...prev, modifiedRow]);
+            }
         }
-    };
-
-    const handleCellValueChanged = event => {
-        setIsModifyEnabled(true);
-        const { node, data } = event;
-        const modifiedRow = { _id: data._id, updatedData: data };
-        const existingIndex = modifiedRows.findIndex(row => row._id === data._id);
-        if (existingIndex !== -1) {
-          const updatedmodifiedRows = [...modifiedRows];
-          updatedmodifiedRows[existingIndex] = modifiedRow;
-          setModifiedRows(updatedmodifiedRows);
-        } else {
-          setModifiedRows(prev => [...prev, modifiedRow]);
-        }
-    };
-
-    const getRowStyle = params => {
-        const modifiedRow = modifiedRows.find(row => row._id === params.data._id);
-        return modifiedRow ? { background: 'lightyellow' } : null;
     };
 
     return (
@@ -362,9 +368,7 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, h
                         rowSelection={'multiple'}
                         suppressRowClickSelection={true}
                         onSelectionChanged={onSelectionChanged}
-                        onCellEditingStarted={handleCellEditingStarted}
                         onCellValueChanged={handleCellValueChanged}
-                        getRowStyle={getRowStyle}
                     />
                 </div>
             </div>
@@ -372,4 +376,4 @@ const TableViewComponent = ( { rowData, handleNewRowData, handleDeleteRowData, h
     )
 }
 
-export default TableViewComponent;
+export default TableView;
