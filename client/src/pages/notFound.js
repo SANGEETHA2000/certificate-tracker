@@ -1,4 +1,4 @@
-import React, { useState, useEffect  } from 'react';
+import React from 'react';
 import appLogo from '../assets/logo.png';
 
 const NotFound = () => {

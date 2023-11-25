@@ -56,7 +56,7 @@ const CheckCertificateDetailsDialogComponent = ({ openCheckCertificateDetailsDia
                         )}
                         {domainNameError && (
                             <div className='flex flex-col items-center justify-center gap-6 pb-5'>
-                                <p className='text-red-700 text-center'>{domainNameError}</p>
+                                <span className='text-red-700 text-center'>{domainNameError}</span>
                                 <button
                                     className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
                                     onClick={handleCloseCheckCertificateDetailsDialogAndClearData}

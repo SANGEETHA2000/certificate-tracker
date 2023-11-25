@@ -22,17 +22,17 @@ const Login = () => {
 
     return (
         <div className="flex flex-row h-full w-full">
-            <div className="basis-4/6 bg-teal-600 flex flex-col items-center justify-center gap-8">
-                <img src={appLogo} alt="SSL Monitor Logo" className='w-28 h-32 rounded-lg'/>
-                <p className="text-white text-5xl text-center"> Monitor the expiry of all your SSL domain certificates
+            <div className="basis-4/6 bg-teal-600 flex flex-row items-center justify-center gap-10">
+                <img src={appLogo} alt="SSL Monitor Logo" className='w-44 h-48 rounded-lg'/>
+                <p className="text-white text-5xl text-left" style={{ lineHeight: '1.5' }}>SSL Certificate Monitor:
                 <br />
-                and
+                Vigilantly Monitoring Expiry,
                 <br />
-                get notified!
+                Promptly Notifying You!
                 </p>
             </div>
             <div className="basis-2/6 flex flex-col items-center justify-center pl-10 pr-28 gap-6">
-                <span className='text-2xl text-teal-900 font-semibold w-full'>Login to SSL Certificate Monitor</span>
+                <span className='text-2xl text-teal-900 font-semibold w-full'>Login to your dashboard</span>
                 <div className='w-full'>
                     <form
                         id="email-form"

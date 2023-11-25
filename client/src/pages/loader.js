@@ -6,6 +6,7 @@ const Loading = () => {
     const [dots, setDots] = useState('');
 
     useEffect(() => {
+        console.log("loader use effect")
         const intervalId = setInterval(() => {
             setDots((prevDots) => {
                 if (prevDots.length === 3) {

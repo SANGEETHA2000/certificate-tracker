@@ -28,7 +28,6 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [refreshRowsSelected, setRefreshRowsSelected] = useState([]);
     const [isModifyEnabled, setIsModifyEnabled] = useState(false);
     const [modifiedRows, setModifiedRows] = useState([]);
-    const [hasModified, setHasModified] = useState(true);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -139,7 +138,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
 
     const handleSubmitAddDomain = async () => {
         try {
-            await axios.post('http://localhost:5000/api/add-domain', {
+            const response = await axios.post('http://localhost:5000/api/add-domain', {
                 email: localStorage.getItem("userEmail"),
                 domain: addDomainName,
                 issuer: addDomainIssuer,
@@ -159,7 +158,8 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     isNotified: isNotificationEnabled,
                     daysBeforeNotified: isNotificationEnabled ? notificationDays : null,
                     inNotificationPeriod: false,
-                    lastEmailSent: null  
+                    lastEmailSent: null,
+                    _id: response.data._id
                 }
             );
         } catch (err) {
@@ -171,7 +171,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const getDomainDetails = async () => {
         if (!isAddAfterCheck) {
             await axios
-            .get(`http://localhost:5000api/get-domain-certificate-details?domain=${addDomainName}`)
+            .get(`http://localhost:5000/api/get-domain-certificate-details?domain=${addDomainName}`)
             .then((response) => {
                 setAddDomainIssuer(response.data.issuer);
                 setAddDomainValidFrom(response.data.valid_from);
@@ -179,6 +179,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 setAddDomainError('');
             })
             .catch((err) => {
+                console.log(err)
                 setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
                 setAddDomainIssuer('');
                 setAddDomainValidFrom('');
@@ -195,12 +196,14 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     };
 
     useEffect (() => {
+        console.log("new domain use effect")
         if(newDomainDetail && Object.keys(newDomainDetail).length !== 0) {
             handleNewRowData(newDomainDetail);
         }
     }, [newDomainDetail]);
 
     useEffect (() => {
+        console.log("add domainn new effect")
         if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent()) {
             handleSubmitAddDomain();
         }
@@ -247,19 +250,16 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     }
 
     const handleOnModifyClicked = async () => {
-        console.log(modifiedRows)
         try {
             const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
                 field: "notifications", "domains": modifiedRows
             });
-            console.log(response);
             handleRefreshRowData(response.data.updated);
             setModifiedRows([]);
             setAddDomainError('');
             setIsModifyEnabled(false);
             const gridApi = gridRef.current.api; // Assuming you have the grid API reference
             const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified']; // Replace with your column field names
-            console.log(gridApi)
             columnsToRemoveStyle.forEach(column => {
                 const columnApi = gridApi.getColumnApi();
                 const colDef = columnApi.getColumn(column).getColDef();
@@ -273,7 +273,6 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     } 
 
     const handleCellValueChanged = (params) => {
-        console.log(params);
         setIsModifyEnabled(true);
         if (params.oldValue !== params.newValue) {
             if (typeof params.value === 'boolean') {
