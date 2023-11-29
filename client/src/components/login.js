@@ -1,23 +1,39 @@
 import appLogo from '../assets/logo.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import password from '../.passwords';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [isValidEmail, setIsValidEmail] = useState(true);
+    const [inValidEmailError, setInValidEmailError] = useState("");
     const navigate = useNavigate();
 
     const handleEmailSubmit = (e) => {
         e.preventDefault();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const isValid = emailRegex.test(email);
-        if (isValid) {
-            localStorage.setItem('userEmail', email);
-            navigate('/dashboard');
-        } else {
-            setIsValidEmail(false);
-        }
-        
+        axios.get(`https://emailvalidation.abstractapi.com/v1/?api_key=${password.emailValidationAPIKey}&email=${email}`)
+            .then(response => {
+                if (response.data.deliverability === "UNDELIVERABLE") {
+                    setIsValidEmail(false);
+                    if (response.data.autocorrect !== "") {
+                        setInValidEmailError(`Did you mean ${response.data.autocorrect}?? Please correct and submit again!`)
+                    }
+                    else if (!response.data.is_valid_format.value) {
+                        setInValidEmailError(`Invalid email format!`)
+                    }
+                    else {
+                        setInValidEmailError(`Email does not exist!`)
+                    }
+                }
+                else if (response.data.deliverability === "DELIVERABLE"){
+                    localStorage.setItem('userEmail', email);
+                    navigate('/dashboard');
+                }
+            })
+            .catch(error => {
+                console.log(error);
+            });
     };
 
     return (
@@ -58,7 +74,7 @@ const Login = () => {
                         </button>              
                     </form>
                     {!isValidEmail && (
-                        <p className='text-red-500 text-sm'>Please enter a valid email address!</p>
+                        <p className='text-red-500 text-sm'>{inValidEmailError}</p>
                     )}
                 </div>
             </div>

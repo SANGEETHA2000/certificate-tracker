@@ -57,26 +57,22 @@ const CheckCertificateDetailsDialogComponent = ({ openCheckCertificateDetailsDia
                         {domainNameError && (
                             <div className='flex flex-col items-center justify-center gap-6 pb-5'>
                                 <span className='text-red-700 text-center'>{domainNameError}</span>
-                                <button
-                                    className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
-                                    onClick={handleCloseCheckCertificateDetailsDialogAndClearData}
-                                >Close</button>
                             </div>
                         )}
                     </DialogContentText>
                 </DialogContent>
-                {checkDomainIssuer && (
-                    <div className='flex flex-row items-center justify-center gap-6 pb-5'>
+                <div className='flex flex-row items-center justify-center gap-6 pb-5'>
+                    {checkDomainIssuer && !domainNameError && (
                         <button
                             className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
                             onClick={handleMonitorDomain}
                         >Monitor this domain</button>
-                        <button
-                            className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
-                            onClick={handleCloseCheckCertificateDetailsDialogAndClearData}
-                        >Close</button>
-                    </div>
-                )}
+                    )}
+                    <button
+                        className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
+                        onClick={handleCloseCheckCertificateDetailsDialogAndClearData}
+                    >Close</button>
+                </div>              
             </Dialog>
         </>        
     );

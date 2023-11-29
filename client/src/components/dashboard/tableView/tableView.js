@@ -28,6 +28,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [refreshRowsSelected, setRefreshRowsSelected] = useState([]);
     const [isModifyEnabled, setIsModifyEnabled] = useState(false);
     const [modifiedRows, setModifiedRows] = useState([]);
+    const [noOfRows, setNoOfRows] = useState(rowData.length);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -82,11 +83,15 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         setIsCheckCertificateDetailsOpen(true);
     };
 
-    const handleCloseCheckCertificateDetailsDialog = () => {
+    const handleCloseCheckCertificateDetailsDialog = (event, reason) => {
+        if (reason && reason == "backdropClick") 
+            return;
         setIsCheckCertificateDetailsOpen(false);
     };
 
-    const handleCloseCheckCertificateDetailsDialogAndClearData = () => {
+    const handleCloseCheckCertificateDetailsDialogAndClearData = (event, reason) => {
+        if (reason && reason == "backdropClick") 
+            return;
         setIsCheckCertificateDetailsOpen(false);
         setAddDomainName("");
         setAddDomainValidFrom("");
@@ -117,7 +122,9 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         handleOpenAddDomainDialog();
     }
 
-    const handleCloseAddDomainDialog = () => {
+    const handleCloseAddDomainDialog = (event, reason) => {
+        if (reason && reason == "backdropClick") 
+            return;
         setIsAddDomainOpen(false);
         setIsAddAfterCheck(false);
         setAddDomainName("");
@@ -297,6 +304,10 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         }
     };
 
+    useEffect(() => {
+        setNoOfRows(rowData.length);
+    }, [rowData]);
+
     return (
         <div className='bg-white w-full h-full flex flex-col'>
             <div className='flex flex-row p-5 justify-between'>
@@ -305,6 +316,8 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         type="text" id="search" name="search"
                         placeholder="Search domain..."
                         className='outline-0 p-2 w-full'
+                        disabled={noOfRows==0 ? true : false}
+                        title="Search domain from the table below"
                         onInput={onFilterTextBoxChanged}
                     />
                 </div>
