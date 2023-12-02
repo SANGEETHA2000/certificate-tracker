@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 
-const AddDomainDialogComponent = ({ openAddDomainDialog,
+const AddDomainDialog = ({ openAddDomainDialog,
                                     handleCloseAddDomainDialog,
                                     addDomainName, setAddDomainName,
                                     notificationDays, setNotificationDays,
@@ -12,7 +12,7 @@ const AddDomainDialogComponent = ({ openAddDomainDialog,
                                     domainNameError, isAddAfterCheck }) => {
 
     return (
-        <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true} maxWidth={'sm'}> 
+        <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true}> 
             <DialogTitle>Add a new domain to monitor</DialogTitle> 
             <DialogContent className='flex flex-col gap-5'>
                 <form className='flex flex-col gap-4'>
@@ -70,4 +70,4 @@ const AddDomainDialogComponent = ({ openAddDomainDialog,
     )
 }
 
-export default AddDomainDialogComponent;
+export default AddDomainDialog;

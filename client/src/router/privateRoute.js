@@ -10,7 +10,7 @@ const PrivateRoute = ( props ) => {
   ) : (
     <Navigate
       replace={true}
-      to="/login"
+      to="/"
       state={{ from: `${location.pathname}${location.search}` }}
     />
   )

@@ -4,7 +4,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 
-const CheckCertificateDetailsDialogComponent = ({ openCheckCertificateDetailsDialog,
+const CheckCertificateDetailsDialog = ({ openCheckCertificateDetailsDialog,
                                                 handleCloseCheckCertificateDetailsDialog,
                                                 handleCloseCheckCertificateDetailsDialogAndClearData,
                                                 checkDomainName, setCheckDomainName,
@@ -78,4 +78,4 @@ const CheckCertificateDetailsDialogComponent = ({ openCheckCertificateDetailsDia
     );
 };
 
-export default CheckCertificateDetailsDialogComponent;
+export default CheckCertificateDetailsDialog;

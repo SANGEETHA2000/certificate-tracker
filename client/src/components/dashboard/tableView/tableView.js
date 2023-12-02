@@ -342,7 +342,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         onClick={handleOpenAddDomainDialog}>Add Domain
                     </button>
                     {isAddDomainOpen &&
-                        <AddDomainDialogComponent
+                        <AddDomainDialog
                             openAddDomainDialog={isAddDomainOpen}
                             handleCloseAddDomainDialog={handleCloseAddDomainDialog}
                             addDomainName={addDomainName} setAddDomainName={handleChangeAddDomainName}
@@ -357,7 +357,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         onClick={handleOpenCheckCertificateDetailsDialog}>Check Certificate Details
                     </button>
                     {isCheckCertificateDetailsOpen &&
-                        <CheckCertificateDetailsDialogComponent
+                        <CheckCertificateDetailsDialog
                             openCheckCertificateDetailsDialog={isCheckCertificateDetailsOpen}
                             handleCloseCheckCertificateDetailsDialog={handleCloseCheckCertificateDetailsDialog}
                             handleCloseCheckCertificateDetailsDialogAndClearData={handleCloseCheckCertificateDetailsDialogAndClearData}

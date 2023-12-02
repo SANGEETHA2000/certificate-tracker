@@ -56,7 +56,7 @@ const Dashboard = () => {
 
     const handleLogOut = () => {
         localStorage.removeItem('userEmail');
-        navigate('/login');
+        navigate('/');
     }
 
     return (
