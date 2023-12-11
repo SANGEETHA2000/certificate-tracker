@@ -6,7 +6,12 @@ import 'ag-grid-community/styles/ag-theme-alpine.css';
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import CheckCertificateDetailsDialog from './checkCertificateDetails/checkCertificateDetails';
 import AddDomainDialog from './addDomain/addDomain';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
+const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefreshRowData } ) => {
     const gridRef = useRef();
@@ -20,7 +25,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [addDomainExpiry, setAddDomainExpiry] = useState('');
     const [notificationDays, setNotificationDays] = useState(30);
     const [isNotificationEnabled, setIsNotificationEnabled] = useState(false);
-    const [addDomainError, setAddDomainError] = useState('');
+    const [snackBarMessage, setSnackBarMessage] = useState('');
     const [isAddAfterCheck, setIsAddAfterCheck] = useState(false);
     const [newDomainDetail, setNewDomainDetail] = useState({});
     const [deletionRowsSelected, setDeletionRowsSelected] = useState([]);
@@ -30,6 +35,8 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [modifiedRows, setModifiedRows] = useState([]);
     const [noOfRows, setNoOfRows] = useState(rowData.length);
     const [isSmallScreen, setIsSmallScreen] = useState(false);
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [snackBarSeverity, setSnackBarSeverity] = useState('');
 
     const defaultColDef = useMemo(() => {
         return {
@@ -85,20 +92,20 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     };
 
     const handleCloseCheckCertificateDetailsDialog = (event, reason) => {
-        if (reason && reason == "backdropClick") 
+        if (reason && reason === "backdropClick") 
             return;
         setIsCheckCertificateDetailsOpen(false);
     };
 
     const handleCloseCheckCertificateDetailsDialogAndClearData = (event, reason) => {
-        if (reason && reason == "backdropClick") 
+        if (reason && reason === "backdropClick") 
             return;
         setIsCheckCertificateDetailsOpen(false);
         setAddDomainName("");
         setAddDomainValidFrom("");
         setAddDomainExpiry("");
         setAddDomainIssuer("");
-        setAddDomainError('');
+        setSnackBarMessage('');
     };
 
     function handleChangeAddDomainName(e) {
@@ -124,7 +131,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     }
 
     const handleCloseAddDomainDialog = (event, reason) => {
-        if (reason && reason == "backdropClick") 
+        if (reason && reason === "backdropClick") 
             return;
         setIsAddDomainOpen(false);
         setIsAddAfterCheck(false);
@@ -134,8 +141,13 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         setAddDomainIssuer("");
         setIsNotificationEnabled(false);
         setNotificationDays(30);
-        setAddDomainError('');
     };
+
+    const handleCloseSnackBar = () => {
+        setOpenSnackBar(false);
+        setSnackBarMessage('');
+        setSnackBarSeverity('');
+    }
 
     const isDomainNamePresent = () => {
         if (rowData){
@@ -155,8 +167,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 daysBeforeNotified: isNotificationEnabled ? notificationDays : null,
                 inNotificationPeriod: false,
                 lastEmailSent: null        
-            });       
-            setAddDomainError('');
+            });  
             setNewDomainDetail(
                 {
                     email: localStorage.getItem("userEmail"),
@@ -170,8 +181,13 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     _id: response.data._id
                 }
             );
+            setSnackBarMessage('Domain successfully added!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('success');
         } catch (err) {
-            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+            setSnackBarMessage(err.response?.data?.error || 'Error in adding this domain!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('error');
         }
         handleCloseAddDomainDialog();
     }
@@ -184,11 +200,13 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 setAddDomainIssuer(response.data.issuer);
                 setAddDomainValidFrom(response.data.valid_from);
                 setAddDomainExpiry(response.data.valid_until);
-                setAddDomainError('');
+                setSnackBarMessage('');
             })
             .catch((err) => {
                 console.log(err)
-                setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+                setSnackBarMessage(err.response?.data?.error || 'Error in fetching the domain certificate details!');
+                setOpenSnackBar(true);
+                setSnackBarSeverity('error');
                 setAddDomainIssuer('');
                 setAddDomainValidFrom('');
                 setAddDomainExpiry('');
@@ -198,7 +216,9 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             if (!isDomainNamePresent()) {
                 handleSubmitAddDomain();
             } else {
-                setAddDomainError('Domain is already being monitored!');
+                setSnackBarMessage('Domain is already being monitored!');
+                setOpenSnackBar(true);
+                setSnackBarSeverity('warning');
             }
         }
     };
@@ -212,11 +232,13 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
 
     useEffect (() => {
         console.log("add domainn new effect")
-        if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent()) {
+        if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent() && snackBarMessage==='') {
             handleSubmitAddDomain();
         }
         else if(isDomainNamePresent()) {
-            setAddDomainError('Domain is already being monitored!');
+            setSnackBarMessage('Domain is already being monitored!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('warning');
         }
     }, [ addDomainExpiry, addDomainIssuer ]);
     
@@ -236,10 +258,14 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             });
             handleDeleteRowData(deletionRowsSelected);
             setDeletionRowsSelected([]);
-            setAddDomainError('');
+            setSnackBarMessage('Domain(s) successfully deleted!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('success');
             setIsRefreshDeleteEnabled(false);
         } catch (err) {
-            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+            setSnackBarMessage(err.response?.data?.error || 'Error in deleting the selected domain(s)!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('error');
         }
     }
 
@@ -250,10 +276,14 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             });
             handleRefreshRowData(response.data.updated);
             setRefreshRowsSelected([]);
-            setAddDomainError('');
+            setSnackBarMessage('Domain(s) successfully refreshed!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('success');
             setIsRefreshDeleteEnabled(false);
         } catch (err) {
-            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+            setSnackBarMessage(err.response?.data?.error || 'Error in refreshing the selected domain(s)!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('error');
         }
     }
 
@@ -264,19 +294,24 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             });
             handleRefreshRowData(response.data.updated);
             setModifiedRows([]);
-            setAddDomainError('');
+            setSnackBarMessage('Modification(s) successfully saved!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('success');
             setIsModifyEnabled(false);
-            const gridApi = gridRef.current.api;
-            const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified'];
-            columnsToRemoveStyle.forEach(column => {
-                const columnApi = gridApi.getColumnApi();
-                const colDef = columnApi.getColumn(column).getColDef();
-                colDef.cellStyle = null;
-            });
+            // const gridApi = gridRef.current.api;
+            // const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified'];
+            // columnsToRemoveStyle.forEach(column => {
+            //     const columnApi = gridApi.getColumnApi();
+            //     const colDef = columnApi.getColumn(column).getColDef();
+            //     colDef.cellStyle = null;
+            // });
 
-            gridApi.redrawRows();
+            // gridApi.redrawRows();
         } catch (err) {
-            setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
+            console.log(err)
+            setSnackBarMessage(err.response?.data?.error || 'Error in saving the modification(s)!');
+            setOpenSnackBar(true);
+            setSnackBarSeverity('error');
         }
     } 
 
@@ -294,7 +329,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 rowNodes: [params.node]
             });
             const modifiedRow = { _id: params.data._id, updatedData: params.data };
-            const existingIndex = modifiedRows.findIndex(row => row._id ===params.data._id);
+            const existingIndex = modifiedRows.findIndex(row => row._id === params.data._id);
             if (existingIndex !== -1) {
                 const updatedmodifiedRows = [...modifiedRows];
                 updatedmodifiedRows[existingIndex] = modifiedRow;
@@ -371,7 +406,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         disabled={!isModifyEnabled}
                         onClick={handleOnModifyClicked}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                            <path fill-rule="evenodd" d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 001.075.676L10 15.082l5.925 2.844A.75.75 0 0017 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0010 2z" clip-rule="evenodd" />
+                            <path fillRule="evenodd" d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 001.075.676L10 15.082l5.925 2.844A.75.75 0 0017 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0010 2z" clipRule="evenodd" />
                         </svg>
                         {isSmallScreen ? (
                             <></>
@@ -384,7 +419,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         disabled={!isRefreshDeleteEnabled}
                         onClick={handleOnDeleteClicked}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+                            <path fillRule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clipRule="evenodd" />
                         </svg>
                         {isSmallScreen ? (
                             <></>
@@ -428,8 +463,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     addDomainName={addDomainName} setAddDomainName={handleChangeAddDomainName}
                     notificationDays={notificationDays} setNotificationDays={handleNotificationDays}
                     isNotificationEnabled={isNotificationEnabled} setIsNotificationEnabled={handleNotificationEnabled}
-                    handleSubmitAddDomain={getDomainDetails}
-                    domainNameError={addDomainError} isAddAfterCheck={isAddAfterCheck} />
+                    handleSubmitAddDomain={getDomainDetails} isAddAfterCheck={isAddAfterCheck} />
             }
             {isCheckCertificateDetailsOpen &&
                 <CheckCertificateDetailsDialog
@@ -439,9 +473,19 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     checkDomainName={addDomainName} setCheckDomainName={handleChangeAddDomainName}
                     handleSubmitCheckDetails={getDomainDetails}
                     checkDomainIssuer={addDomainIssuer} checkDomainExpiry={addDomainExpiry} checkDomainValidFrom={addDomainValidFrom}
-                    handleMonitorDomain={handleMonitorDomain}
-                    domainNameError={addDomainError} />
+                    handleMonitorDomain={handleMonitorDomain} />
             }
+            {snackBarMessage && (
+                <Snackbar
+                    open={openSnackBar}
+                    autoHideDuration={5000}
+                    anchorOrigin={{ vertical: 'bottom', horizontal:'right' }}
+                    onClose={handleCloseSnackBar}>
+                    <Alert onClose={handleCloseSnackBar} severity={snackBarSeverity} sx={{ width: '100%' }}>
+                        {snackBarMessage}
+                    </Alert>
+                </Snackbar>
+            )}
         </div>
     )
 }

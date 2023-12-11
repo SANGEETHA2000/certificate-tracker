@@ -8,8 +8,7 @@ const AddDomainDialog = ({ openAddDomainDialog,
                                     addDomainName, setAddDomainName,
                                     notificationDays, setNotificationDays,
                                     isNotificationEnabled, setIsNotificationEnabled,
-                                    handleSubmitAddDomain,
-                                    domainNameError, isAddAfterCheck }) => {
+                                    handleSubmitAddDomain, isAddAfterCheck }) => {
 
     return (
         <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true}> 
@@ -48,9 +47,6 @@ const AddDomainDialog = ({ openAddDomainDialog,
                         </div>
                     )}
                 </form>
-                {domainNameError && (
-                    <p className='text-red-700 text-center'>{domainNameError}</p>
-                )}
             </DialogContent> 
             <div className='flex flex-row p-5'>
                 <div className='flex w-1/2 item-center justify-center'>

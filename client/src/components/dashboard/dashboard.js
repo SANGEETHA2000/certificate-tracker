@@ -48,6 +48,9 @@ const Dashboard = () => {
                 setOpenSnackBar(true);
                 setSnackBarSeverity('error');
                 setUserData([]);
+                setTimeout(() => {
+                    navigate('/');
+                }, 5000)
             }
         };
         fetchData();
@@ -214,7 +217,11 @@ const Dashboard = () => {
                 </div>
             </div>
             {snackBarMessage && (
-                <Snackbar open={openSnackBar} autoHideDuration={6000} onClose={handleCloseSnackBar}>
+                <Snackbar
+                    open={openSnackBar}
+                    autoHideDuration={5000}
+                    anchorOrigin={{ vertical: 'bottom', horizontal:'right' }}
+                    onClose={handleCloseSnackBar}>
                     <Alert onClose={handleCloseSnackBar} severity={snackBarSeverity} sx={{ width: '100%' }}>
                         {snackBarMessage}
                     </Alert>

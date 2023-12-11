@@ -10,8 +10,7 @@ const CheckCertificateDetailsDialog = ({ openCheckCertificateDetailsDialog,
                                                 checkDomainName, setCheckDomainName,
                                                 handleSubmitCheckDetails,
                                                 checkDomainIssuer, checkDomainExpiry, checkDomainValidFrom,
-                                                handleMonitorDomain,
-                                                domainNameError }) => {
+                                                handleMonitorDomain }) => {
 
     return (
         <>
@@ -54,15 +53,10 @@ const CheckCertificateDetailsDialog = ({ openCheckCertificateDetailsDialog,
                                 </tbody>
                             </table>
                         )}
-                        {domainNameError && (
-                            <div className='flex flex-col items-center justify-center gap-6 pb-5'>
-                                <span className='text-red-700 text-center'>{domainNameError}</span>
-                            </div>
-                        )}
                     </DialogContentText>
                 </DialogContent>
                 <div className='flex flex-row items-center justify-center gap-6 pb-5'>
-                    {checkDomainIssuer && !domainNameError && (
+                    {checkDomainIssuer && (
                         <button
                             className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
                             onClick={handleMonitorDomain}
