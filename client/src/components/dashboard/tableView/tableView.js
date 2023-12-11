@@ -4,8 +4,8 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
-import CheckCertificateDetailsDialogComponent from './checkCertificateDetails/checkCertificateDetails';
-import AddDomainDialogComponent from './addDomain/addDomain';
+import CheckCertificateDetailsDialog from './checkCertificateDetails/checkCertificateDetails';
+import AddDomainDialog from './addDomain/addDomain';
 
 
 const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefreshRowData } ) => {
@@ -29,6 +29,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [isModifyEnabled, setIsModifyEnabled] = useState(false);
     const [modifiedRows, setModifiedRows] = useState([]);
     const [noOfRows, setNoOfRows] = useState(rowData.length);
+    const [isSmallScreen, setIsSmallScreen] = useState(false);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -265,15 +266,15 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setModifiedRows([]);
             setAddDomainError('');
             setIsModifyEnabled(false);
-            const gridApi = gridRef.current.api; // Assuming you have the grid API reference
-            const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified']; // Replace with your column field names
+            const gridApi = gridRef.current.api;
+            const columnsToRemoveStyle = ['daysBeforeNotified', 'isNotified'];
             columnsToRemoveStyle.forEach(column => {
                 const columnApi = gridApi.getColumnApi();
                 const colDef = columnApi.getColumn(column).getColDef();
-                colDef.cellStyle = null; // Remove cell style
+                colDef.cellStyle = null;
             });
 
-            gridApi.redrawRows(); // Redraw rows to reflect style changes
+            gridApi.redrawRows();
         } catch (err) {
             setAddDomainError(err.response?.data?.error || 'An unexpected error occurred!');
         }
@@ -308,69 +309,105 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         setNoOfRows(rowData.length);
     }, [rowData]);
 
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver((entries) => {
+            const { width } = entries[0].contentRect;
+            setIsSmallScreen(width < 768);
+        });
+        resizeObserver.observe(window.document.body);
+        return () => {
+            resizeObserver.disconnect();
+        };
+    }, []);
+
     return (
         <div className='bg-white w-full h-full flex flex-col'>
-            <div className='flex flex-row p-5 justify-between'>
-                <div className='w-5/12 border-b-2 border-teal-400 border-solid focus-within:border-teal-500'>
+            <div className='flex flex-row px-2 md:px-5 py-3 items-center justify-between'>
+                <span className="text-teal-900 text-base font-bold md:text-xl">List of monitored domains</span>
+                <div className="flex gap-1 md:gap-2 lg:gap-4">
+                    <button
+                        className='flex flex-row items-center gap-1 bg-teal-500 py-1 px-1 lg:py-2 lg:px-3 text-white rounded-full md:rounded-lg lg:rounded-xl outline-0 hover:bg-teal-600'
+                        onClick={handleOpenAddDomainDialog}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        {isSmallScreen ? (
+                            <></>
+                        ) : (
+                            <span className="font-semibold">Add Domain</span>
+                        )}
+                    </button>
+                    <button
+                        className='flex flex-row items-center gap-1 bg-teal-500 py-1 px-1 lg:py-2 lg:px-3 text-white rounded-full md:rounded-lg lg:rounded-xl outline-0 hover:bg-teal-600'
+                        onClick={handleOpenCheckCertificateDetailsDialog}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />
+                        </svg>
+                        {isSmallScreen ? (
+                            <></>
+                        ) : (
+                            <span className="font-semibold">Check Certificate Details</span>
+                        )}
+                    </button>
+                </div>
+            </div>
+            <div className='flex flex-row px-2 md:px-5 py-1 md:py-3 justify-between w-full gap-2 md:gap-4 lg:gap-6 items-center'>
+                <div className='flex flex-row gap-1 items-center w-full p-1 rounded-full bg-slate-100'>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="rgb(45 212 191)" className="pl-1 w-6 h-6">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
                     <input
                         type="text" id="search" name="search"
                         placeholder="Search domain..."
-                        className='outline-0 p-2 w-full'
-                        disabled={noOfRows==0 ? true : false}
+                        className='outline-0 w-full p-1 bg-slate-100 rounded-full text-xs md:text-base'
+                        disabled={noOfRows===0 ? true : false}
                         title="Search domain from the table below"
                         onInput={onFilterTextBoxChanged}
                     />
                 </div>
-                <div className='flex gap-4'>
-                    
+                <div className='flex gap-1 md:gap-2 lg:gap-4 h-fit'>            
                     <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
+                        className='flex flex-row items-center gap-1 bg-teal-500 py-1 px-1 lg:py-2 lg:px-3 text-white rounded-full md:rounded-lg lg:rounded-xl outline-0 hover:bg-teal-600 disabled:bg-teal-200 disabled:text-teal-50'
                         disabled={!isModifyEnabled}
-                        onClick={handleOnModifyClicked}>Modify</button>
-                    <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
-                        disabled={!isRefreshDeleteEnabled}
-                        onClick={handleOnDeleteClicked}>Delete</button>
-                    <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600 disabled:bg-teal-300 disabled:text-teal-50'
-                        disabled={!isRefreshDeleteEnabled}
-                        onClick={handleOnRefreshClicked}>Refresh</button>
-
-                    <div className="border-r-2 border-teal-200"></div>
-                    <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
-                        onClick={handleOpenAddDomainDialog}>Add Domain
+                        onClick={handleOnModifyClicked}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fill-rule="evenodd" d="M10 2c-1.716 0-3.408.106-5.07.31C3.806 2.45 3 3.414 3 4.517V17.25a.75.75 0 001.075.676L10 15.082l5.925 2.844A.75.75 0 0017 17.25V4.517c0-1.103-.806-2.068-1.93-2.207A41.403 41.403 0 0010 2z" clip-rule="evenodd" />
+                        </svg>
+                        {isSmallScreen ? (
+                            <></>
+                        ) : (
+                            <span className="font-semibold">Save</span>
+                        )}
                     </button>
-                    {isAddDomainOpen &&
-                        <AddDomainDialog
-                            openAddDomainDialog={isAddDomainOpen}
-                            handleCloseAddDomainDialog={handleCloseAddDomainDialog}
-                            addDomainName={addDomainName} setAddDomainName={handleChangeAddDomainName}
-                            notificationDays={notificationDays} setNotificationDays={handleNotificationDays}
-                            isNotificationEnabled={isNotificationEnabled} setIsNotificationEnabled={handleNotificationEnabled}
-                            handleSubmitAddDomain={getDomainDetails}
-                            domainNameError={addDomainError} isAddAfterCheck={isAddAfterCheck} />
-                    }
-
                     <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
-                        onClick={handleOpenCheckCertificateDetailsDialog}>Check Certificate Details
+                        className='flex flex-row items-center gap-1 bg-teal-500 py-1 px-1 lg:py-2 lg:px-3 text-white rounded-full md:rounded-lg lg:rounded-xl outline-0 hover:bg-teal-600 disabled:bg-teal-200 disabled:text-teal-50'
+                        disabled={!isRefreshDeleteEnabled}
+                        onClick={handleOnDeleteClicked}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd" />
+                        </svg>
+                        {isSmallScreen ? (
+                            <></>
+                        ) : (
+                            <span className="font-semibold">Delete</span>
+                        )}
                     </button>
-                    {isCheckCertificateDetailsOpen &&
-                        <CheckCertificateDetailsDialog
-                            openCheckCertificateDetailsDialog={isCheckCertificateDetailsOpen}
-                            handleCloseCheckCertificateDetailsDialog={handleCloseCheckCertificateDetailsDialog}
-                            handleCloseCheckCertificateDetailsDialogAndClearData={handleCloseCheckCertificateDetailsDialogAndClearData}
-                            checkDomainName={addDomainName} setCheckDomainName={handleChangeAddDomainName}
-                            handleSubmitCheckDetails={getDomainDetails}
-                            checkDomainIssuer={addDomainIssuer} checkDomainExpiry={addDomainExpiry} checkDomainValidFrom={addDomainValidFrom}
-                            handleMonitorDomain={handleMonitorDomain}
-                            domainNameError={addDomainError} />
-                    }
-
+                    <button
+                        className='flex flex-row items-center gap-1 bg-teal-500 py-1 px-1 lg:py-2 lg:px-3 text-white rounded-full md:rounded-lg lg:rounded-xl outline-0 hover:bg-teal-600 disabled:bg-teal-200 disabled:text-teal-50'
+                        disabled={!isRefreshDeleteEnabled}
+                        onClick={handleOnRefreshClicked}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2.5" stroke="currentColor" className="w-4 h-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                        </svg>
+                        {isSmallScreen ? (
+                            <></>
+                        ) : (
+                            <span className="font-semibold">Refresh</span>
+                        )}
+                    </button>
                 </div>
             </div>
-            <div style={containerStyle} className='p-3'>
+            <div style={containerStyle} className='px-2 md:px-5 py-3'>
                 <div style={gridStyle} className="ag-theme-alpine">
                     <AgGridReact
                         ref={gridRef}
@@ -384,6 +421,27 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     />
                 </div>
             </div>
+            {isAddDomainOpen &&
+                <AddDomainDialog
+                    openAddDomainDialog={isAddDomainOpen}
+                    handleCloseAddDomainDialog={handleCloseAddDomainDialog}
+                    addDomainName={addDomainName} setAddDomainName={handleChangeAddDomainName}
+                    notificationDays={notificationDays} setNotificationDays={handleNotificationDays}
+                    isNotificationEnabled={isNotificationEnabled} setIsNotificationEnabled={handleNotificationEnabled}
+                    handleSubmitAddDomain={getDomainDetails}
+                    domainNameError={addDomainError} isAddAfterCheck={isAddAfterCheck} />
+            }
+            {isCheckCertificateDetailsOpen &&
+                <CheckCertificateDetailsDialog
+                    openCheckCertificateDetailsDialog={isCheckCertificateDetailsOpen}
+                    handleCloseCheckCertificateDetailsDialog={handleCloseCheckCertificateDetailsDialog}
+                    handleCloseCheckCertificateDetailsDialogAndClearData={handleCloseCheckCertificateDetailsDialogAndClearData}
+                    checkDomainName={addDomainName} setCheckDomainName={handleChangeAddDomainName}
+                    handleSubmitCheckDetails={getDomainDetails}
+                    checkDomainIssuer={addDomainIssuer} checkDomainExpiry={addDomainExpiry} checkDomainValidFrom={addDomainValidFrom}
+                    handleMonitorDomain={handleMonitorDomain}
+                    domainNameError={addDomainError} />
+            }
         </div>
     )
 }

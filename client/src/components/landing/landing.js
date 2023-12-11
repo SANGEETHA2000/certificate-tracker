@@ -17,7 +17,7 @@ const Landing = () => {
     return (
         <div className='flex flex-col h-full w-full bg-gradient-to-b from-white via-teal-50 to-teal-100 px-6 md:px-10 lg:px-16 py-10 gap-10 md:gap-0'>
             <div className='flex items-center justify-between'>
-                <img src={appLogo} alt="SSL Monitor Logo" className='h-8 w-32'/>
+                <img src={appLogo} alt="Certrac Logo" className='h-8 w-32'/>
                 <button
                     className='bg-teal-500 py-2 px-4 text-white text-sm md:text-lg font-medium rounded-full outline-0 hover:bg-teal-600'
                     onClick={handleOpenLoginDialog}

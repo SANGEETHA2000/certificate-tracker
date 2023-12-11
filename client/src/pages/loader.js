@@ -21,7 +21,7 @@ const Loading = () => {
     return (
         <div className="bg-white h-full w-full items-center justify-center flex flex-col">
             <div className="shadow-xl shadow-teal-100 h-16 w-16">
-                <img src={appLogo} alt="SSL Monitor Logo" />
+                <img src={appLogo} alt="Certrac Logo" />
             </div>
             <div>
                 <p className="text-4xl font-bold text-teal-300">{dots}</p>

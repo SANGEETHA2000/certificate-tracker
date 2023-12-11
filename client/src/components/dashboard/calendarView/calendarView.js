@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import '@mobiscroll/react/dist/css/mobiscroll.min.css';
-import { Page, Eventcalendar } from '@mobiscroll/react';
+import FullCalendar from '@fullcalendar/react'
+import dayGridPlugin from '@fullcalendar/daygrid'
 
 function CalendarView( { calendarData } ) {
 
@@ -27,7 +27,7 @@ function CalendarView( { calendarData } ) {
               color = 'red';
               expiringVerySoon = expiringVerySoon + 1;
             } else if (daysDifference <= 30) {
-              color = 'yellow';
+              color = '#facc15';
               expiringSoon = expiringSoon + 1;
             } else {
               color = 'green';
@@ -37,7 +37,8 @@ function CalendarView( { calendarData } ) {
               title: item.domain,
               start: formattedExpiryDate,
               end: formattedExpiryDate,
-              color: color,
+              allDay: true,
+              color: color
             };
         });
         setEvents(events);
@@ -53,30 +54,29 @@ function CalendarView( { calendarData } ) {
     }, []);
 
     return (
-        <div className='flex flex-row h-full w-full'>
-            <Page className='w-3/4'>
-                <Eventcalendar
-                    theme="ios" 
-                    themeVariant="light"
-                    clickToCreate={false}
-                    dragToCreate={false}
-                    dragToMove={false}
-                    dragToResize={false}
-                    eventDelete={false}
-                    data={events}
-                    view={view}
+        <div className='flex flex-col h-full w-full px-3 pb-3'>
+            <div className='basis-1/12 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-10 md:gap-16 lg:gap-20 py-2 sm:py-0'>
+                <div className='py-1 px-3 bg-red-200 rounded-2xl'>
+                    <span className='text-md lg:text-lg font-semibold text-red-700 flex justify-center'>Expiring Very Soon: {expiringVerySoon}</span>
+                </div>
+                <div className='py-1 px-3 bg-yellow-200 rounded-2xl'>
+                    <span className='text-md lg:text-lg font-semibold text-yellow-700 flex justify-center'>Expiring Soon: {expiringSoon}</span>
+                </div>
+                <div className='py-1 px-3 bg-green-200 rounded-2xl'>
+                    <span className='text-md lg:text-lg font-semibold text-green-700 flex justify-center'>Expiring Later: {expiringLater}</span>
+                </div>
+            </div>
+            <div className='basis-11/12 border border-solid border-slate-100'>
+                <FullCalendar
+                    plugins={[ dayGridPlugin ]}
+                    initialView="dayGridMonth"
+                    headerToolbar= {{
+                        left: 'prev,next',
+                        center: 'title',
+                        right: 'dayGridYear,dayGridMonth,dayGridWeek,dayGridDay'
+                    }}
+                    events={ events }
                 />
-            </Page>
-            <div className='w-1/4 flex flex-col p-7 items-center justify-center gap-5'>
-                <div className='w-full p-4 bg-red-200 rounded-2xl'>
-                    <span className='text-lg font-semibold text-red-700 flex justify-center'>Expiring Very Soon: {expiringVerySoon}</span>
-                </div>
-                <div className='w-full p-4 bg-yellow-200 rounded-2xl'>
-                    <span className='text-lg font-semibold text-yellow-700 flex justify-center'>Expiring Soon: {expiringSoon}</span>
-                </div>
-                <div className='w-full p-4 bg-green-200 rounded-2xl'>
-                    <span className='text-lg font-semibold text-green-700 flex justify-center'>Expiring Later: {expiringLater}</span>
-                </div>
             </div>
         </div>
     )

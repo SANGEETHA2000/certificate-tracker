@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.fc {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.fc .fc-view-harness {
+    height: 0px !important; 
+}
+
+@media only screen and (max-width: 639px) {
+    .fc .fc-toolbar {
+      flex-direction: column;
+    }
+  }
+  

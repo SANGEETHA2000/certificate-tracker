@@ -39,7 +39,7 @@ const Login = ({handleCloseLoginDialog, isLoginDialogOpen}) => {
     return (
         <Dialog open={isLoginDialogOpen} onClose={handleCloseLoginDialog} fullWidth={true}>
             <div className="flex flex-col p-6 gap-10 pb-12">
-                <img src={appLogo} alt="SSL Monitor Logo" className='h-8 w-32'/>
+                <img src={appLogo} alt="Certrac Logo" className='h-8 w-32'/>
                 <div className="basis-2/6 flex flex-col items-center justify-center gap-6">
                     <span className='text-2xl text-teal-900 font-semibold w-full'>Login to start monitoring</span>
                     <div className='w-full'>
