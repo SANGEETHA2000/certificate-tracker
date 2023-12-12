@@ -1,7 +1,6 @@
 import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 
 const AddDomainDialog = ({ openAddDomainDialog,
                                     handleCloseAddDomainDialog,
@@ -12,14 +11,14 @@ const AddDomainDialog = ({ openAddDomainDialog,
 
     return (
         <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true}> 
-            <DialogTitle>Add a new domain to monitor</DialogTitle> 
+            <span className="py-4 px-6 font-semibold text-2xl">Add a new domain to monitor</span> 
             <DialogContent className='flex flex-col gap-5'>
                 <form className='flex flex-col gap-4'>
                     <div className='flex flex-row justify-start'>
                         <label className='pr-4 text-lg w-7/12'>Domain name</label>
                         <input
                             type="text" id="domain" name="domain"
-                            className='w-5/12 outline-0 p-1 border-2 border-teal-400 border-solid focus-within:border-teal-500'
+                            className='w-5/12 outline-0 p-1 border-2 border-gray-400 border-solid focus-within:border-gray-500'
                             value={addDomainName}
                             onChange={setAddDomainName}
                             disabled={isAddAfterCheck}
@@ -48,19 +47,15 @@ const AddDomainDialog = ({ openAddDomainDialog,
                     )}
                 </form>
             </DialogContent> 
-            <div className='flex flex-row p-5'>
-                <div className='flex w-1/2 item-center justify-center'>
-                    <button
-                        className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
-                        onClick={handleSubmitAddDomain}
-                    >Submit</button>
-                </div>
-                <div className='flex w-1/2 item-center justify-center'>
-                    <button
-                        className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
-                        onClick={handleCloseAddDomainDialog}
-                    >Cancel</button>
-                </div>
+            <div className='flex flex-row px-5 pb-5 justify-end gap-4'>
+                <button
+                    className='border border-gray-200 py-2 px-3 text-black rounded-md outline-0 hover:bg-gray-100'
+                    onClick={handleCloseAddDomainDialog}
+                >Cancel</button>
+                <button
+                    className='bg-emerald-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-emerald-600'
+                    onClick={handleSubmitAddDomain}
+                >Add Domain</button>
             </div>
         </Dialog>
     )

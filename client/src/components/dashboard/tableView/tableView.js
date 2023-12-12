@@ -8,6 +8,7 @@ import CheckCertificateDetailsDialog from './checkCertificateDetails/checkCertif
 import AddDomainDialog from './addDomain/addDomain';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Dialog from '@mui/material/Dialog';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -37,6 +38,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [isSmallScreen, setIsSmallScreen] = useState(false);
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [snackBarSeverity, setSnackBarSeverity] = useState('');
+    const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -251,7 +253,11 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         })));
     }, []);
 
-    const handleOnDeleteClicked = async () => {
+    const handleOnDeleteClicked = () => {
+        setOpenDeleteConfirmationDialog(true);
+    }
+
+    const handleOnDeleteConfirmClicked = async () => {
         try {
             await axios.delete('http://localhost:5000/api/delete-domains', {
                 data: { domains: deletionRowsSelected }
@@ -267,6 +273,11 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
         }
+        setOpenDeleteConfirmationDialog(false);
+    }
+
+    const handleOnDeleteCloseClicked = () => {
+        setOpenDeleteConfirmationDialog(false);
     }
 
     const handleOnRefreshClicked = async () => {
@@ -486,6 +497,36 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                     </Alert>
                 </Snackbar>
             )}
+            {openDeleteConfirmationDialog &&
+                <Dialog
+                    open={openDeleteConfirmationDialog}
+                    onClose={handleOnDeleteCloseClicked}
+                >
+                    <div className="flex flex-col">
+                        <div className="flex flex-row items-center">
+                            <div className="flex items-center pl-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" class="w-16 h-16">
+                                    <path fillRule="evenodd" d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" />
+                                </svg>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="pt-4 pb-2 px-6 font-semibold text-2xl">Are you sure?</span>
+                                <span className="pb-4 px-6 font-normal text-md">This action will stop monitoring the selected domains</span>
+                            </div>
+                        </div>
+                        <div className='flex flex-row px-5 pb-5 justify-end gap-4'>
+                            <button
+                                className='border border-gray-200 py-2 px-3 text-black rounded-md outline-0 hover:bg-gray-100'
+                                onClick={handleOnDeleteCloseClicked}
+                            >Cancel</button>
+                            <button
+                                className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
+                                onClick={handleOnDeleteConfirmClicked}
+                            >Delete Domain(s)</button>
+                        </div>
+                    </div>
+              </Dialog>
+            }
         </div>
     )
 }

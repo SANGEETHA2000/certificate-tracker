@@ -1,17 +1,35 @@
 .alreadyExpired .cell-element {
     font-weight: bold;
-    background-color: #b91c1c;
-    color: white;
+    background-color: rgb(254 202 202);
+    color: rgb(185 28 28);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
 }
 
 .expiringSoon .cell-element {
     font-weight: bold;
-    background-color: #a16207;
-    color: white;
+    background-color: rgb(254 240 138);
+    color:  rgb(161 98 7);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
 }
 
 .otherDomains .cell-element {
     font-weight: bold;
-    background-color: #15803d;
-    color: white;
+    background-color: rgb(187 247 208);
+    color: rgb(21 128 61);
+    display: flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    align-items: center;
+    justify-content: center;
 }

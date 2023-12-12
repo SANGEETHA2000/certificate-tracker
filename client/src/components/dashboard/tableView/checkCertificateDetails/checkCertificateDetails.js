@@ -15,7 +15,7 @@ const CheckCertificateDetailsDialog = ({ openCheckCertificateDetailsDialog,
     return (
         <>
             <Dialog open={openCheckCertificateDetailsDialog} onClose={handleCloseCheckCertificateDetailsDialog}>
-                <DialogTitle>Check SSL Certificate Details</DialogTitle>
+                <span className="pt-4 px-6 font-semibold text-2xl">Get Domain Certificate Details</span> 
                 <DialogContent className='flex flex-col'>
                     <div className='flex flex-row justify-between'>
                         <input
@@ -55,17 +55,17 @@ const CheckCertificateDetailsDialog = ({ openCheckCertificateDetailsDialog,
                         )}
                     </DialogContentText>
                 </DialogContent>
-                <div className='flex flex-row items-center justify-center gap-6 pb-5'>
+                <div className='flex flex-row px-5 pb-5 justify-center gap-4'>
+                    <button
+                        className='border border-gray-200 py-2 px-3 text-black rounded-md outline-0 hover:bg-gray-100'
+                        onClick={handleCloseCheckCertificateDetailsDialogAndClearData}
+                    >Close</button>
                     {checkDomainIssuer && (
                         <button
-                            className='bg-teal-500 py-2 px-3 text-white rounded-md outline-0 hover:bg-teal-600'
+                            className='bg-emerald-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-emerald-600'
                             onClick={handleMonitorDomain}
                         >Monitor this domain</button>
                     )}
-                    <button
-                        className='bg-red-500 py-2 px-3 text-white rounded-lg outline-0 hover:bg-red-600'
-                        onClick={handleCloseCheckCertificateDetailsDialogAndClearData}
-                    >Close</button>
                 </div>              
             </Dialog>
         </>        
