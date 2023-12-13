@@ -9,6 +9,7 @@ import AddDomainDialog from './addDomain/addDomain';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Dialog from '@mui/material/Dialog';
+import Loader from "../../../pages/loader";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -39,6 +40,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [snackBarSeverity, setSnackBarSeverity] = useState('');
     const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
+    const [openLoader, setOpenLoader] = useState(false);
 
     const defaultColDef = useMemo(() => {
         return {
@@ -159,6 +161,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     };
 
     const handleSubmitAddDomain = async () => {
+        setOpenLoader(true);
         try {
             const response = await axios.post('http://localhost:5000/api/add-domain', {
                 email: localStorage.getItem("userEmail"),
@@ -191,11 +194,13 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
         }
+        setOpenLoader(false);
         handleCloseAddDomainDialog();
     }
 
     const getDomainDetails = async () => {
         if (!isAddAfterCheck) {
+            setOpenLoader(true);
             await axios
             .get(`http://localhost:5000/api/get-domain-certificate-details?domain=${addDomainName}`)
             .then((response) => {
@@ -213,6 +218,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 setAddDomainValidFrom('');
                 setAddDomainExpiry('');
             });
+            setOpenLoader(false);
         }
         else {
             if (!isDomainNamePresent()) {
@@ -258,6 +264,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     }
 
     const handleOnDeleteConfirmClicked = async () => {
+        setOpenLoader(true);
         try {
             await axios.delete('http://localhost:5000/api/delete-domains', {
                 data: { domains: deletionRowsSelected }
@@ -273,6 +280,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
         }
+        setOpenLoader(false);
         setOpenDeleteConfirmationDialog(false);
     }
 
@@ -281,6 +289,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     }
 
     const handleOnRefreshClicked = async () => {
+        setOpenLoader(true);
         try {
             const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
                 field: "expiry", "domains": refreshRowsSelected 
@@ -296,9 +305,11 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
         }
+        setOpenLoader(false);
     }
 
     const handleOnModifyClicked = async () => {
+        setOpenLoader(true);
         try {
             const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
                 field: "notifications", "domains": modifiedRows
@@ -324,6 +335,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
         }
+        setOpenLoader(false);
     } 
 
     const handleCellValueChanged = (params) => {
@@ -526,6 +538,9 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                         </div>
                     </div>
               </Dialog>
+            }
+            {openLoader && 
+                <Loader openLoader={openLoader} />
             }
         </div>
     )

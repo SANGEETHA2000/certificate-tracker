@@ -3,11 +3,11 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 
 const AddDomainDialog = ({ openAddDomainDialog,
-                                    handleCloseAddDomainDialog,
-                                    addDomainName, setAddDomainName,
-                                    notificationDays, setNotificationDays,
-                                    isNotificationEnabled, setIsNotificationEnabled,
-                                    handleSubmitAddDomain, isAddAfterCheck }) => {
+                            handleCloseAddDomainDialog,
+                            addDomainName, setAddDomainName,
+                            notificationDays, setNotificationDays,
+                            isNotificationEnabled, setIsNotificationEnabled,
+                            handleSubmitAddDomain, isAddAfterCheck }) => {
 
     return (
         <Dialog open={openAddDomainDialog} onClose={handleCloseAddDomainDialog} fullWidth={true}> 

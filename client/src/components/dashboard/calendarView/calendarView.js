@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 
@@ -46,12 +46,6 @@ function CalendarView( { calendarData } ) {
         setExpiringSoon(expiringSoon);
         setExpiringLater(expiringLater);
     }, [calendarData]);
-    
-    const view = useMemo(() => {
-        return {
-            calendar: { labels: true }
-        };
-    }, []);
 
     return (
         <div className='flex flex-col h-full w-full px-3 pb-3'>

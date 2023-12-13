@@ -1,33 +1,18 @@
-import React, { useState, useEffect  } from 'react';
-import appLogo from '../assets/logo.png';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
-const Loading = () => {
-
-    const [dots, setDots] = useState('');
-
-    useEffect(() => {
-        console.log("loader use effect")
-        const intervalId = setInterval(() => {
-            setDots((prevDots) => {
-                if (prevDots.length === 3) {
-                  return '.';
-                }
-                return prevDots + '.';
-            });
-        }, 400);
-        return () => clearInterval(intervalId);
-    }, []); // Empty dependency array to run the effect only once on mount
+const Loader = ( {openLoader} ) => {
 
     return (
-        <div className="bg-white h-full w-full items-center justify-center flex flex-col">
-            <div className="shadow-xl shadow-teal-100 h-16 w-16">
-                <img src={appLogo} alt="Certrac Logo" />
-            </div>
-            <div>
-                <p className="text-4xl font-bold text-teal-300">{dots}</p>
-            </div>
+        <div>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: 9999 }}
+                open={openLoader}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </div>
-    )
+    );
 }
 
-export default Loading;
+export default Loader;

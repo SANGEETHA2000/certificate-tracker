@@ -15,6 +15,7 @@ import Logout from '@mui/icons-material/Logout';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Dialog from '@mui/material/Dialog';
+import Loader from "../../pages/loader";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -29,8 +30,10 @@ const Dashboard = () => {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [snackBarSeverity, setSnackBarSeverity] = useState('');
     const [openLogoutConfirmationDialog, setOpenLogoutConfirmationDialog] = useState(false);
+    const [openLoader, setOpenLoader] = useState(false);
     const open = Boolean(dropdown);
     const navigate = useNavigate();
+
     const handleProfileDropdown = (event) => {
         setDropdown(event.currentTarget);
     };
@@ -41,6 +44,7 @@ const Dashboard = () => {
     useEffect(() => {       
         console.log("in dashboard useeffect")
         const fetchData = async () => {
+            setOpenLoader(true);
             try {
                 const response = await axios.get(`http://localhost:5000/api/get-domains-list?userEmail=${localStorage.getItem("userEmail")}`);
                 setUserData(response.data);
@@ -54,6 +58,7 @@ const Dashboard = () => {
                     navigate('/');
                 }, 5000)
             }
+            setOpenLoader(false);
         };
         fetchData();
         const resizeObserver = new ResizeObserver((entries) => {
@@ -267,6 +272,9 @@ const Dashboard = () => {
                         </div>
                     </div>
               </Dialog>
+            }
+            {openLoader && 
+                <Loader openLoader={openLoader} />
             }
         </div>
     )
