@@ -3,21 +3,27 @@
 @tailwind utilities;
 
 .fc {
-    width: 100% !important;
-    height: 100% !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .fc .fc-view-harness {
-    height: 0px !important; 
+  height: 0px !important;
 }
 
 @media only screen and (max-width: 639px) {
-    .fc .fc-toolbar {
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
+  .fc .fc-toolbar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: xx-small;
   }
-  
+}
+
+@media only screen and (max-width: 639px) {
+  .fc .fc-view-harness {
+    font-size: xx-small;
+  }
+}

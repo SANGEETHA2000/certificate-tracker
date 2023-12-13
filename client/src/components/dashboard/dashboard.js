@@ -42,7 +42,6 @@ const Dashboard = () => {
     };
     
     useEffect(() => {       
-        console.log("in dashboard useeffect")
         const fetchData = async () => {
             setOpenLoader(true);
             try {

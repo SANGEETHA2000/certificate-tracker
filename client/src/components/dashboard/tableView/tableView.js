@@ -210,7 +210,6 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
                 setSnackBarMessage('');
             })
             .catch((err) => {
-                console.log(err)
                 setSnackBarMessage(err.response?.data?.error || 'Error in fetching the domain certificate details!');
                 setOpenSnackBar(true);
                 setSnackBarSeverity('error');
@@ -232,14 +231,12 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     };
 
     useEffect (() => {
-        console.log("new domain use effect")
         if(newDomainDetail && Object.keys(newDomainDetail).length !== 0) {
             handleNewRowData(newDomainDetail);
         }
     }, [newDomainDetail]);
 
     useEffect (() => {
-        console.log("add domainn new effect")
         if(addDomainName && addDomainName!=="" && isAddDomainOpen && !isDomainNamePresent() && snackBarMessage==='') {
             handleSubmitAddDomain();
         }
@@ -330,7 +327,6 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
 
             // gridApi.redrawRows();
         } catch (err) {
-            console.log(err)
             setSnackBarMessage(err.response?.data?.error || 'Error in saving the modification(s)!');
             setOpenSnackBar(true);
             setSnackBarSeverity('error');
