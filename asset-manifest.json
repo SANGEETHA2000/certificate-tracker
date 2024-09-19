@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/certrac/static/css/main.f3d4b72c.css",
-    "main.js": "/certrac/static/js/main.cc39750d.js",
+    "main.js": "/certrac/static/js/main.3a4af5f9.js",
     "static/js/787.d5fa4d18.chunk.js": "/certrac/static/js/787.d5fa4d18.chunk.js",
     "static/media/logo.png": "/certrac/static/media/logo.770d60b32fbf20cc8193.png",
     "static/media/tinyLogo.png": "/certrac/static/media/tinyLogo.7cf69a86b1e8f7f88ac3.png",
     "index.html": "/certrac/index.html",
     "main.f3d4b72c.css.map": "/certrac/static/css/main.f3d4b72c.css.map",
-    "main.cc39750d.js.map": "/certrac/static/js/main.cc39750d.js.map",
+    "main.3a4af5f9.js.map": "/certrac/static/js/main.3a4af5f9.js.map",
     "787.d5fa4d18.chunk.js.map": "/certrac/static/js/787.d5fa4d18.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f3d4b72c.css",
-    "static/js/main.cc39750d.js"
+    "static/js/main.3a4af5f9.js"
   ]
 }
