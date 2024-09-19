@@ -3,7 +3,6 @@ import appLogo from '../../../assets/logo.png';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import password from '../../../.passwords';
 import Loader from "../../../pages/loader";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
@@ -31,7 +30,7 @@ const Login = ({handleCloseLoginDialog, isLoginDialogOpen}) => {
     const handleEmailSubmit = (e) => {
         e.preventDefault();
         setOpenLoader(true);
-        axios.get(`https://emailvalidation.abstractapi.com/v1/?api_key=${password.emailValidationAPIKey}&email=${email}`)
+        axios.get(`https://emailvalidation.abstractapi.com/v1/?api_key=${process.env.REACT_APP_EMAIL_VALIDATION_API_KEY}&email=${email}`)
             .then(response => {
                 if (response.data.deliverability === "UNDELIVERABLE") {
                     setIsValidEmail(false);

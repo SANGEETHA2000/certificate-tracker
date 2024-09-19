@@ -149,4 +149,4 @@ yarn-debug.log*
 yarn-error.log*
 
 server/.passwords.json
-client/src/.passwords.js
+client/src/.env
