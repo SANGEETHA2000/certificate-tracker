@@ -4,7 +4,6 @@ const domainRoutes = require('./routes/domainRoutes');
 const cron = require('node-cron');
 const emailService = require('./services/emailService')
 const cors = require('cors');
-const passwords = require('./.passwords.json')
 
 // Initialize an express app
 const app = express();
@@ -19,7 +18,7 @@ app.use(cors());
 app.use(domainRoutes);
 
 // Connect to MongoDB
-mongoose.connect(`mongodb+srv://sangeetha2000vd:${passwords.dbPassword}@cluster0.8fjl8mr.mongodb.net/CertificateMonitorDB`)
+mongoose.connect(process.env.DB_CONNECTION_STRING)
 .then(() => {
   console.log('Connected to MongoDB');
 })
