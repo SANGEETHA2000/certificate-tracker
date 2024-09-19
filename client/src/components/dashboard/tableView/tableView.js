@@ -163,7 +163,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const handleSubmitAddDomain = async () => {
         setOpenLoader(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/add-domain', {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/add-domain`, {
                 email: localStorage.getItem("userEmail"),
                 domain: addDomainName,
                 issuer: addDomainIssuer,
@@ -202,7 +202,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
         if (!isAddAfterCheck) {
             setOpenLoader(true);
             await axios
-            .get(`http://localhost:5000/api/get-domain-certificate-details?domain=${addDomainName}`)
+            .get(`${process.env.REACT_APP_API_URL}/api/get-domain-certificate-details?domain=${addDomainName}`)
             .then((response) => {
                 setAddDomainIssuer(response.data.issuer);
                 setAddDomainValidFrom(response.data.valid_from);
@@ -263,7 +263,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const handleOnDeleteConfirmClicked = async () => {
         setOpenLoader(true);
         try {
-            await axios.delete('http://localhost:5000/api/delete-domains', {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/delete-domains`, {
                 data: { domains: deletionRowsSelected }
             });
             handleDeleteRowData(deletionRowsSelected);
@@ -288,7 +288,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const handleOnRefreshClicked = async () => {
         setOpenLoader(true);
         try {
-            const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/update-domain-certificate-details`, {
                 field: "expiry", "domains": refreshRowsSelected 
             });
             handleRefreshRowData(response.data.updated);
@@ -308,7 +308,7 @@ const TableView = ( { rowData, handleNewRowData, handleDeleteRowData, handleRefr
     const handleOnModifyClicked = async () => {
         setOpenLoader(true);
         try {
-            const response = await axios.put('http://localhost:5000/api/update-domain-certificate-details', {
+            const response = await axios.put(`${process.env.REACT_APP_API_URL}/api/update-domain-certificate-details`, {
                 field: "notifications", "domains": modifiedRows
             });
             handleRefreshRowData(response.data.updated);

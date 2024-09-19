@@ -45,7 +45,7 @@ const Dashboard = () => {
         const fetchData = async () => {
             setOpenLoader(true);
             try {
-                const response = await axios.get(`http://localhost:5000/api/get-domains-list?userEmail=${localStorage.getItem("userEmail")}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/get-domains-list?userEmail=${localStorage.getItem("userEmail")}`);
                 setUserData(response.data);
                 setSnackBarMessage('');
             } catch (err) {
